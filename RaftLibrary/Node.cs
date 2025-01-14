@@ -19,7 +19,10 @@
             return _term;
         }
 
-
+        public NodeState GetState()
+        {
+            return NodeState.Follower;
+        }
 
     }
 }

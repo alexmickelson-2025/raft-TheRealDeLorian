@@ -11,5 +11,12 @@ namespace RaftTests
             node.TimeoutElection();
             Assert.Equal(2, node.GetTerm());
         }
+
+        [Fact]
+        public void NewNodeShouldStartAsFollower()
+        {
+            Node node = new Node(1);
+            Assert.Equal(NodeState.Follower, node.GetState());
+        }
     }
 }
