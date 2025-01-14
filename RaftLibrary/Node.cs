@@ -7,6 +7,7 @@ namespace RaftLibrary
     {
         int _term;
         public string votedFor;
+        public string currentLeader;
 
         public Node()
         {
@@ -31,6 +32,10 @@ namespace RaftLibrary
 
         public async Task<string> AppendEntries(RPCData data)
         {
+            if(data.Entry == null)
+            {
+                currentLeader = data.SentFrom;
+            }
             return "Successfully appended entries";
         }
 

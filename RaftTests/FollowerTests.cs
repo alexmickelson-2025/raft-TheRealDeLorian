@@ -79,8 +79,12 @@ namespace RaftTests
         {
             Node node = new Node();
             await node.AppendEntries(new RPCData() { SentFrom = "Leader"});
-            node.votedFor.Should().Be("Leader");
+            node.currentLeader.Should().Be("Leader");
+            await node.AppendEntries(new RPCData() { SentFrom = "Impostor", Entry="Hello! I'm not sus" });
+            node.currentLeader.Should().Be("Leader");
         }
+
+
 
     }
 }
