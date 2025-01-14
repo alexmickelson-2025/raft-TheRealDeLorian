@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace RaftLibrary
 {
@@ -7,9 +8,9 @@ namespace RaftLibrary
         int _term;
         public string votedFor;
 
-        public Node(int term)
+        public Node()
         {
-            _term = term;
+            _term = 1;
         }
 
         public async Task TimeoutElection()
@@ -17,14 +18,20 @@ namespace RaftLibrary
             _term++;
         }
 
+
+
         public async Task<int> GetTerm()
         {
             return _term;
         }
-
-        public async Task<string> AppendEntries(string entry)
+        public async Task SetTerm(int term)
         {
-            return "";
+            _term = term;
+        }
+
+        public async Task<string> AppendEntries(RPCData data)
+        {
+            return "Successfully appended entries";
         }
 
         public async Task<NodeState> GetState()

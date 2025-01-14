@@ -4,10 +4,10 @@
 	- [] 5.1. between
 	- [] 5.2. random: call n times and make sure that there are some that are different (other properties of the distribution if you like)
 - [] 7. When a follower does get an AppendEntries message, it resets the election timer. (i.e. it doesn't start an election even after more than 300ms)
-- [] 10. A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)
-- [] 17. When a follower node receives an AppendEntries request, it sends a response.
-
+- [x] 10. A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)
+- [x] 17. When a follower node receives an AppendEntries request, it sends a response.
 - [] 2. When a node receives an AppendEntries from another node, then first node remembers that other node is the current leader.
+
 - [] 14. If a node receives a second request for vote for the same term, it should respond no. (again, separate RPC for response)
 - [] 15. If a node receives a second request for vote for a future term, it should vote for that node.
  
