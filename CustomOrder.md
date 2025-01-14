@@ -1,4 +1,4 @@
-- [] 3. When a new node is initialized, it should be in follower state.
+- [x] 3. When a new node is initialized, it should be in follower state.
 - [] 4. When a follower doesn't get a message for 300ms then it starts an election.
 - [] 5. When the election time is reset, it is a random value between 150 and 300ms.
 	- [] 5.1. between
