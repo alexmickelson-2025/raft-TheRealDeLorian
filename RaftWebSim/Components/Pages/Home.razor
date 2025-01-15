@@ -1,0 +1,40 @@
+﻿@page "/"
+@using RaftLibrary
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<button @onclick="StartSim">start</button>
+
+@foreach(var node in nodes)
+{
+    <div>
+        @node.Id
+    </div>
+}
+
+
+@code {
+    List<SimNode>? nodes = [];
+
+    void StartSim()
+    {
+        var node1 = new Node(); //consider initializing with other nodes and the own node id Node([], 1)
+        var node2 = new Node(); //consider initializing with other nodes and the own node id
+        var node3 = new Node(); //consider initializing with other nodes and the own node id
+
+        var simulation1 = new SimNode(node1);
+        var simulation2 = new SimNode(node1);
+        var simulation3 = new SimNode(node1);
+
+        // node1.OtherNodes = [simulation2, simulation3]; do this for all 3
+
+        nodes = [simulation1, simulation2, simulation3];
+
+
+    }
+}

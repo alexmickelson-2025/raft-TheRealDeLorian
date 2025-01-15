@@ -11,6 +11,13 @@ namespace RaftLibrary
         public string currentLeader;
         public NodeState state;
         System.Timers.Timer t;
+        public int Id { get; set; }
+        public int LeaderId { get; set; }
+        public NodeState State { get; set; }
+        public int Term {get; set;}
+        public int VotedFor {get; set;}
+
+
 
         public Node()
         {

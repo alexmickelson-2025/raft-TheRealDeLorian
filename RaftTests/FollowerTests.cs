@@ -1,9 +1,11 @@
 ﻿using FluentAssertions;
+using Meziantou.Xunit;
 using NSubstitute;
 using RaftLibrary;
 
 namespace RaftTests
 {
+    [DisableParallelization]
     public class FollowerTests
     {
         [Fact]
@@ -39,7 +41,7 @@ namespace RaftTests
         public async void WhenNoEmptyAppendIsReceivedAnElectionIsStarted()
         {
             Node node = new Node();
-            await Task.Delay(300);
+            Thread.Sleep(350);
             NodeState state = await node.GetState();
             state.Should().Be(NodeState.Candidate);
         }
