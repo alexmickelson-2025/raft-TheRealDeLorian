@@ -4,7 +4,7 @@ using System.Timers;
 
 namespace RaftLibrary
 {
-    public class Node
+    public class Node : INode
     {
         int _term;
         public string votedFor;
