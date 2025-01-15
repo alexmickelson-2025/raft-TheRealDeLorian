@@ -10,7 +10,7 @@ namespace RaftTests
         public async void TestFollowerTermIncrementOnElectionTimeout()
         {
             Node node = new Node();
-            node.TimeoutElection();
+            await node.TimeoutElection();
             int term = await node.GetTerm();
             term.Should().Be(2);
         }
@@ -29,21 +29,20 @@ namespace RaftTests
         public async void WhenEmptyAppendIsReceivedNoElectionIsStarted()
         {
             Node node = new Node();
-            node.AppendEntries(new RPCData() { SentFrom = "Leader" });
+            await node.AppendEntries(new RPCData() { SentFrom = "Leader" });
             NodeState state = await node.GetState();
             state.Should().Be(NodeState.Follower);
         }
+
         //Testing #7
-        //[Fact]
-        //public async void WhenNoEmptyAppendIsReceivedAnElectionIsStarted()
-        //{
-        //    Node node = new Node(1);
-        //    Task.Delay(300);
-        //    NodeState state = await node.GetState();
-        //    state.Should().Be(NodeState.Candidate);
-        //}
-
-
+        [Fact]
+        public async void WhenNoEmptyAppendIsReceivedAnElectionIsStarted()
+        {
+            Node node = new Node();
+            await Task.Delay(300);
+            NodeState state = await node.GetState();
+            state.Should().Be(NodeState.Candidate);
+        }
 
         //Testing #10
         [Fact]
