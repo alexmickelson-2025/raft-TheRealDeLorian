@@ -54,6 +54,10 @@ namespace RaftLibrary
             CurrentTerm++;
             State = NodeState.Candidate;
             VotedFor = Id;
+            if(OtherNodes.Length == 0)
+            {
+                State = NodeState.Leader;
+            }
         }
 
 

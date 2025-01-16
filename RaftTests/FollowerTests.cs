@@ -54,7 +54,7 @@ namespace RaftTests
         [Fact]
         public async Task WhenNoEmptyAppendIsReceivedAnElectionIsStarted()
         {
-            Node node = new Node([], 1);
+            Node node = new Node([new Node([], 2)], 1);
             Thread.Sleep(500);
             NodeState state = node.State;
             state.Should().Be(NodeState.Candidate);
