@@ -53,6 +53,7 @@ namespace RaftLibrary
         {
             CurrentTerm++;
             State = NodeState.Candidate;
+            VotedFor = Id;
         }
 
 
