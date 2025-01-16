@@ -8,8 +8,8 @@
 - [x] 17. When a follower node receives an AppendEntries request, it sends a response.
 - [x] 2. When a node receives an AppendEntries from another node, the first node remembers that other node is the current leader.
 
-- [] 14. If a node receives a second request for vote for the same term, it should respond no. (again, separate RPC for response)
-- [] 15. If a node receives a second request for vote for a future term, it should vote for that node.
+- [x] 14. If a node receives a second request for vote for the same term, it should respond no. (again, separate RPC for response)
+- [x] 15. If a node receives a second request for vote for a future term, it should vote for that node.
  
 - [] 6. When a new election begins, the term is incremented by 1.
 	- [] 6.1. Create a new node, store id in variable.

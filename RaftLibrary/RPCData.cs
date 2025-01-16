@@ -10,6 +10,6 @@ namespace RaftLibrary
     {
         public int Term { get; set; }
         public string Entry { get; set; }
-        public string SentFrom { get; set; }
+        public int SentFrom { get; set; }
     }
 }

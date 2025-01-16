@@ -4,26 +4,23 @@ using System.Timers;
 
 namespace RaftLibrary
 {
-    public class Node : INode
+    public class Node 
     {
-        int _term;
-        public string votedFor;
-        public string currentLeader;
-        public NodeState state;
-        System.Timers.Timer t;
         public int Id { get; set; }
         public int LeaderId { get; set; }
         public NodeState State { get; set; }
-        public int Term {get; set;}
-        public int VotedFor {get; set;}
+        public int CurrentTerm {get; set;}
+        public int? VotedFor {get; set;}
         public int TimeLeft {get; set;}
+        public Node[] OtherNodes {get; set;}
+        System.Timers.Timer t;
         Random r = new();
 
-
-
-        public Node()
+        public Node(Node[] otherNodes, int nodeId)
         {
-            _term = 1;
+            Id = nodeId;
+            OtherNodes = otherNodes;
+            CurrentTerm = 1;
             StartElectionTimer();
         }
 
@@ -54,41 +51,36 @@ namespace RaftLibrary
 
         public async Task TimeoutElection()
         {
-            _term++;
-            state = NodeState.Candidate;
+            CurrentTerm++;
+            State = NodeState.Candidate;
         }
 
-        public async Task<int> GetTerm()
-        {
-            return _term;
-        }
-        public async Task SetTerm(int term)
-        {
-            _term = term;
-        }
 
         public async Task<string> AppendEntries(RPCData data)
         {
             if(data.Entry == null)
             {
-                currentLeader = data.SentFrom;
+                LeaderId = data.SentFrom;
             }
             return "Successfully appended entries";
         }
 
-        public async Task<NodeState> GetState()
+        public async Task<bool> RequestVote(int term, int candidateId)
         {
-            return state;
-        }
-
-        public async Task<bool> RequestVote(int term, string candidateName)
-        {
-            if (term < _term)
+            if (term < CurrentTerm)
             {
                 return false;
             }
-
-            votedFor = candidateName;
+            else if (term > CurrentTerm)
+            {
+               CurrentTerm = term;
+               VotedFor = null;
+            }
+            if(VotedFor is not null)
+            {
+                return false;
+            }
+            VotedFor = candidateId;
             return true;
         }
     }
