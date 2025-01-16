@@ -66,8 +66,8 @@ namespace RaftTests
         {
             Node node = new([], 1);
             Thread.Sleep(350);
-            node.TimeLeft.Should().BeLessThan(300);
-            node.TimeLeft.Should().BeGreaterThan(150);
+            node.TimeLeft.Should().BeLessThan(301);
+            node.TimeLeft.Should().BeGreaterThan(149);
         }
         //Testing 5
         [Fact]

@@ -49,12 +49,12 @@ namespace RaftTests
         public async Task WhenNodeIsCandidateAndTimerExpiresNewElectionStarts()
         {
             Node node = new([new Node([], 2)], 1);
-            Thread.Sleep(500);
+            await node.TimeoutElection();
             node.State.Should().Be(NodeState.Candidate);
             node.CurrentTerm.Should().Be(2);
             node.VotedFor.Should().Be(1);
 
-            Thread.Sleep(node.TimeLeft);
+            await node.TimeoutElection();
             node.State.Should().Be(NodeState.Candidate);
             node.CurrentTerm.Should().Be(3);
             node.VotedFor.Should().Be(1);
@@ -71,10 +71,25 @@ namespace RaftTests
             node.State.Should().Be(NodeState.Leader);
         }
 
-
-
         //Testing #8    
         //3-node cluster
+        [Fact]
+        public async Task ThreeNodeClusterCandidateBecomesLeaderWhenReceivesMajorityOfVotes()
+        {
+            var node1 = new Node([], 1);
+            var node2 = new Node([], 2);
+            var node3 = new Node([], 3);
+
+            node1.OtherNodes = [node2, node3];
+            node2.OtherNodes = [node1, node3];
+            node3.OtherNodes = [node1, node2];
+
+            await node1.TimeoutElection();
+            await node2.RequestVote(2, 1);
+            await node3.RequestVote(2, 1);
+
+            node1.State.Should().Be(NodeState.Leader);
+        }
 
 
 
