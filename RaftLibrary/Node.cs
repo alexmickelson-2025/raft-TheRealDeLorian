@@ -16,6 +16,8 @@ namespace RaftLibrary
         public NodeState State { get; set; }
         public int Term {get; set;}
         public int VotedFor {get; set;}
+        public int TimeLeft {get; set;}
+        Random r = new();
 
 
 
@@ -29,15 +31,24 @@ namespace RaftLibrary
         // https://learn.microsoft.com/en-us/dotnet/api/system.timers.timer?view=net-9.0
         public async Task StartElectionTimer()
         {
-            t = new System.Timers.Timer(300);
+            t = new System.Timers.Timer();
             t.Elapsed += OnTimerRunout;
             t.AutoReset = true;
             t.Enabled = true;
+            ResetTimer();
+        }
+
+        private void ResetTimer()
+        {
+            TimeLeft = r.Next(150, 301);
+            t.Interval = TimeLeft;
+            t.Start();
         }
 
         private async void OnTimerRunout(Object source, ElapsedEventArgs e)
         {
             await TimeoutElection();
+            ResetTimer();
         }
 
 

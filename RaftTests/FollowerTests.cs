@@ -36,7 +36,7 @@ namespace RaftTests
             state.Should().Be(NodeState.Follower);
         }
 
-        //Testing #7
+        //Testing #4
         [Fact]
         public async void WhenNoEmptyAppendIsReceivedAnElectionIsStarted()
         {
@@ -44,6 +44,34 @@ namespace RaftTests
             Thread.Sleep(350);
             NodeState state = await node.GetState();
             state.Should().Be(NodeState.Candidate);
+        }
+
+        //Testing 5
+        [Fact]
+        public async void WhenElectionTimeResetsItIsBetween150msAnd300ms()
+        {
+            Node node = new();
+            Thread.Sleep(350);
+            node.TimeLeft.Should().BeLessThan(300);
+            node.TimeLeft.Should().BeGreaterThan(150);
+        }
+        //Testing 5
+        [Fact]
+        public async void WhenElectionTimeResetsItIsRandom()
+        {
+            //call the test like 100 times and make sure that each time is different
+            List<Node> nodes = new();
+            List<int> times = new();
+
+            for (int i = 0; i < 100; i++)
+            {
+                Node node = new();
+                nodes.Add(node);
+                times.Add(node.TimeLeft);
+            }
+
+            var uniqueTimes = times.Distinct().ToList(); //ChatGPT helped me discover the Distinct method, something I didn't know existed
+            uniqueTimes.Count.Should().BeGreaterThan(30);
         }
 
         //Testing #10
@@ -84,6 +112,9 @@ namespace RaftTests
             await node.AppendEntries(new RPCData() { SentFrom = "Impostor", Entry="Hello! I'm not sus" });
             node.currentLeader.Should().Be("Leader");
         }
+
+
+
 
 
 
