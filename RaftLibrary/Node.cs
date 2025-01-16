@@ -54,12 +54,29 @@ namespace RaftLibrary
             CurrentTerm++;
             State = NodeState.Candidate;
             VotedFor = Id;
-            if(OtherNodes.Length == 0)
+            await ConductElection();
+        }
+
+        private async Task ConductElection()
+        {
+            if (OtherNodes.Length == 0)
+            {
+                State = NodeState.Leader;
+            }
+            List<Node> supporters = new();
+            foreach (Node otherNode in OtherNodes)
+            {
+                bool isSupporter = await otherNode.RequestVote(CurrentTerm, Id);
+                if (isSupporter)
+                {
+                    supporters.Add(otherNode);
+                }
+            }
+            if (supporters.Count > OtherNodes.Length * 0.5)
             {
                 State = NodeState.Leader;
             }
         }
-
 
         public async Task<bool> AppendEntries(RPCData data)
         {
