@@ -57,13 +57,17 @@ namespace RaftLibrary
         }
 
 
-        public async Task<string> AppendEntries(RPCData data)
+        public async Task<bool> AppendEntries(RPCData data)
         {
             if(data.Entry == null)
             {
                 LeaderId = data.SentFrom;
             }
-            return "Successfully appended entries";
+            if(data.Term < CurrentTerm)
+            {
+                return false;
+            }
+            return true;
         }
 
         public async Task<bool> RequestVote(int term, int candidateId)

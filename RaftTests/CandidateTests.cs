@@ -10,6 +10,8 @@ namespace RaftTests
 {
     public class CandidateTests
     {
+
+        //Testing #11
         [Theory]
         [InlineData(1)]
         [InlineData(456)]
@@ -20,5 +22,44 @@ namespace RaftTests
             await node.TimeoutElection();
             node.VotedFor.Should().Be(id);
         }
+
+        //Testing #18
+        [Fact]
+        public async Task CandidateRejectsAppendEntriesFromPreviousTerm()
+        {
+            Node node = new([], 1);
+            node.CurrentTerm = 2;
+            bool response = await node.AppendEntries(new RPCData {SentFrom = 2, Term = 1});
+            response.Should().Be(false);
+        }
+
+        //Testing 6
+        [Fact]
+        public async Task NewElectionIncrementsTerm()
+        {
+            Node node = new([], 1);
+            int startingTerm = node.CurrentTerm;
+            await node.TimeoutElection();
+            node.CurrentTerm.Should().BeGreaterThan(startingTerm);
+	
+        }
+
+        //Testing #16
+        [Fact]
+        public async Task WhenNodeIsCandidateAndTimerExpiresNewElectionStarts()
+        {
+            Node node = new([], 1);
+            Thread.Sleep(500);
+            node.State.Should().Be(NodeState.Candidate);
+            node.CurrentTerm.Should().Be(2);
+            node.VotedFor.Should().Be(1);
+
+            Thread.Sleep(node.TimeLeft);
+            node.State.Should().Be(NodeState.Candidate);
+            node.CurrentTerm.Should().Be(3);
+            node.VotedFor.Should().Be(1);
+        }
+
+
     }
 }

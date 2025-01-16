@@ -11,9 +11,9 @@
 - [x] 14. If a node receives a second request for vote for the same term, it should respond no. (again, separate RPC for response)
 - [x] 15. If a node receives a second request for vote for a future term, it should vote for that node.
  
-- [] 11. Given a candidate server that just became a candidate, it votes for itself.
-- [] 18. Given a candidate receives an AppendEntries from a previous term, then rejects.
-- [] 16. Given a candidate, when an election timer expires inside of an election, a new election is started.
+- [x] 11. Given a candidate server that just became a candidate, it votes for itself.
+- [x] 18. Given a candidate receives an AppendEntries from a previous term, then rejects.
+- [x] 16. Given a candidate, when an election timer expires inside of an election, a new election is started.
 - [] 6. When a new election begins, the term is incremented by 1.
 	- [] 6.1. Create a new node, store id in variable.
 	- [] 6.2. wait 300 ms

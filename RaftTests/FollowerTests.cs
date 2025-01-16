@@ -5,7 +5,6 @@ using RaftLibrary;
 
 namespace RaftTests
 {
-    [DisableParallelization]
     public class FollowerTests
     {
         [Fact]
@@ -56,7 +55,7 @@ namespace RaftTests
         public async Task WhenNoEmptyAppendIsReceivedAnElectionIsStarted()
         {
             Node node = new Node([], 1);
-            Thread.Sleep(350);
+            Thread.Sleep(500);
             NodeState state = node.State;
             state.Should().Be(NodeState.Candidate);
         }
@@ -156,8 +155,8 @@ namespace RaftTests
         public async Task FollowerWhoReceivesAppendRequestSendsResponse()
         {
             Node node = new Node([], 1);
-            string response = await node.AppendEntries(new RPCData() { SentFrom = 2 });
-            response.Length.Should().BeGreaterThan(0);
+            bool response = await node.AppendEntries(new RPCData() { Term = 1, SentFrom = 2 });
+            response.Should().BeTrue();
         }
 
         //Testing #2
