@@ -62,7 +62,7 @@ namespace RaftLibrary
         {
             if (OtherNodes.Length == 0)
             {
-                State = NodeState.Leader;
+                State = NodeState.Leader; //consider making this winelection?
             }
             List<Node> supporters = new();
             foreach (Node otherNode in OtherNodes)
