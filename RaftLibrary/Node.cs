@@ -4,15 +4,15 @@ using System.Timers;
 
 namespace RaftLibrary
 {
-    public class Node 
+    public class Node : INode
     {
         public int Id { get; set; }
         public int LeaderId { get; set; }
         public NodeState State { get; set; }
-        public int CurrentTerm {get; set;}
-        public int? VotedFor {get; set;}
-        public int TimeLeft {get; set;}
-        public Node[] OtherNodes {get; set;}
+        public int CurrentTerm { get; set; }
+        public int? VotedFor { get; set; }
+        public int TimeLeft { get; set; }
+        public INode[] OtherNodes { get; set; }
         public int HeartbeatsReceived { get; set; }
         System.Timers.Timer t;
         Random r = new();
@@ -64,8 +64,8 @@ namespace RaftLibrary
             {
                 State = NodeState.Leader; //consider making this winelection?
             }
-            List<Node> supporters = new();
-            foreach (Node otherNode in OtherNodes)
+            List<INode> supporters = new();
+            foreach (INode otherNode in OtherNodes)
             {
                 bool isSupporter = await otherNode.RequestVote(CurrentTerm, Id);
                 if (isSupporter)
@@ -76,16 +76,16 @@ namespace RaftLibrary
             if (supporters.Count > OtherNodes.Length * 0.5)
             {
                 State = NodeState.Leader;
-                foreach (Node otherNode in OtherNodes)
+                foreach (INode otherNode in OtherNodes)
                 {
-                    await otherNode.AppendEntries(new RPCData { SentFrom = Id, Term=CurrentTerm });
+                    await otherNode.AppendEntries(new RPCData { SentFrom = Id, Term = CurrentTerm });
                 }
             }
         }
 
         public async Task<bool> AppendEntries(RPCData data)
         {
-            if(data.Term > CurrentTerm)
+            if (data.Term > CurrentTerm)
             {
                 CurrentTerm = data.Term;
                 State = NodeState.Follower;
@@ -96,7 +96,7 @@ namespace RaftLibrary
                 LeaderId = data.SentFrom;
                 HeartbeatsReceived++;
             }
-            if(data.Term < CurrentTerm)
+            if (data.Term < CurrentTerm)
             {
                 return false;
             }
@@ -111,10 +111,10 @@ namespace RaftLibrary
             }
             else if (term > CurrentTerm)
             {
-               CurrentTerm = term;
-               VotedFor = null;
+                CurrentTerm = term;
+                VotedFor = null;
             }
-            if(VotedFor is not null)
+            if (VotedFor is not null)
             {
                 return false;
             }

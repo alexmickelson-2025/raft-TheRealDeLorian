@@ -3,13 +3,18 @@ namespace RaftLibrary
 {
     public interface INode
     {
+        int CurrentTerm { get; set; }
+        int HeartbeatsReceived { get; set; }
+        int Id { get; set; }
         int LeaderId { get; set; }
-        Task<string> AppendEntries(RPCData data);
-        Task<NodeState> GetState();
-        Task<int> GetTerm();
-        Task<bool> RequestVote(int term, string candidateName);
-        Task SetTerm(int term);
+        INode[] OtherNodes { get; set; }
+        NodeState State { get; set; }
+        int TimeLeft { get; set; }
+        int? VotedFor { get; set; }
+
+        Task<bool> AppendEntries(RPCData data);
+        Task<bool> RequestVote(int term, int candidateId);
         Task StartElectionTimer();
-        Task TimeoutElection();
+        Task Timeout();
     }
 }

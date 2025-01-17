@@ -15,7 +15,7 @@
 
 
 @code {
-    List<SimNode>? nodes = [];
+    List<SimNode> nodes = [];
 
     void StartSim()
     {
@@ -27,10 +27,11 @@
         var simulation2 = new SimNode(node1);
         var simulation3 = new SimNode(node1);
 
-        // node1.OtherNodes = [simulation2, simulation3]; do this for all 3
+        node1.OtherNodes = [simulation2, simulation3];
+        node2.OtherNodes = [simulation1, simulation3];
+        node3.OtherNodes = [simulation1, simulation2];
 
         nodes = [simulation1, simulation2, simulation3];
-
-
+        StateHasChanged();
     }
 }

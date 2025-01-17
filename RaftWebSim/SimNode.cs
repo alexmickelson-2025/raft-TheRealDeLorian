@@ -10,48 +10,34 @@ namespace RaftWebSim
         {
             InnerNode = node;
         }
-        //public int CurrentLeader => InnerNode.CurrentLeader;
-        public int Id { get => InnerNode.Id; set => InnerNode.Id = value; }
+
+        public int CurrentTerm { get => ((INode)InnerNode).CurrentTerm; set => ((INode)InnerNode).CurrentTerm = value; }
+        public int HeartbeatsReceived { get => ((INode)InnerNode).HeartbeatsReceived; set => ((INode)InnerNode).HeartbeatsReceived = value; }
+        public int Id { get => ((INode)InnerNode).Id; set => ((INode)InnerNode).Id = value; }
         public int LeaderId { get => ((INode)InnerNode).LeaderId; set => ((INode)InnerNode).LeaderId = value; }
-        public NodeState State { get; set; }
-        public int Term { get; set; }
+        public INode[] OtherNodes { get => ((INode)InnerNode).OtherNodes; set => ((INode)InnerNode).OtherNodes = value; }
+        public NodeState State { get => ((INode)InnerNode).State; set => ((INode)InnerNode).State = value; }
+        public int TimeLeft { get => ((INode)InnerNode).TimeLeft; set => ((INode)InnerNode).TimeLeft = value; }
+        public int? VotedFor { get => ((INode)InnerNode).VotedFor; set => ((INode)InnerNode).VotedFor = value; }
 
-
-
-
-        public Task<string> AppendEntries(RPCData data)
+        public Task<bool> AppendEntries(RPCData data)
         {
-            throw new NotImplementedException();
+            return ((INode)InnerNode).AppendEntries(data);
         }
 
-        public Task<NodeState> GetState()
+        public Task<bool> RequestVote(int term, int candidateId)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> GetTerm()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> RequestVote(int term, string candidateName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SetTerm(int term)
-        {
-            throw new NotImplementedException();
+            return ((INode)InnerNode).RequestVote(term, candidateId);
         }
 
         public Task StartElectionTimer()
         {
-            throw new NotImplementedException();
+            return ((INode)InnerNode).StartElectionTimer();
         }
 
-        public Task TimeoutElection()
+        public Task Timeout()
         {
-            throw new NotImplementedException();
+            return ((INode)InnerNode).Timeout();
         }
     }
 }
