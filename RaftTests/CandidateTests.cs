@@ -29,7 +29,7 @@ namespace RaftTests
         {
             Node node = new([], 1);
             node.CurrentTerm = 2;
-            bool response = await node.AppendEntries(new RPCData {SentFrom = 2, Term = 1});
+            bool response = await node.AppendEntries(new RPCData { SentFrom = 2, Term = 1 });
             response.Should().Be(false);
         }
 
@@ -41,7 +41,7 @@ namespace RaftTests
             int startingTerm = node.CurrentTerm;
             await node.TimeoutElection();
             node.CurrentTerm.Should().BeGreaterThan(startingTerm);
-	
+
         }
 
         //Testing #16
@@ -92,17 +92,53 @@ namespace RaftTests
         }
 
 
+        //Testing #12
+        [Fact]
+        public async Task WhenCandidateReceivesAppendEntriesFromLaterTermItBecomesFollower()
+        {
+            Node node = new([], 1);
+            Node node2 = new([], 2);
+            node.OtherNodes = [node2];
+            node2.OtherNodes = [node];
+            node2.CurrentTerm = 5;
 
+            await node.TimeoutElection();
+            node.State.Should().Be(NodeState.Candidate);
 
+            await node.AppendEntries(new RPCData { SentFrom = 2, Term = 5 });
+            node.State.Should().Be(NodeState.Follower);
+        }
 
-        //Testing #8    
-        //5-node cluster
+        //Testing #13
+        [Fact]
+        public async Task WhenCandidateReceivesAppendEntriesFromEqualTermItBecomesFollower()
+        {
+            Node node = new([], 1);
+            Node node2 = new([], 2);
+            node.OtherNodes = [node2];
+            node2.OtherNodes = [node];
+            node2.CurrentTerm = 1;
 
+            await node.TimeoutElection();
+            node.State.Should().Be(NodeState.Candidate);
 
-        //Testing #8
-        //11-node cluster
+            await node.AppendEntries(new RPCData { SentFrom = 2, Term = 1 });
+            node.State.Should().Be(NodeState.Follower);
+        }
 
+        //Testing #19
+        [Fact]
+        public async Task WhenCandidateWinsElectionItSendsHeartbeat()
+        {
+            Node node = new([], 1);
+            Node node2 = new([], 2);
+            node.OtherNodes = [node2];
+            node2.OtherNodes = [node];
 
-
+            await node.TimeoutElection();
+            node.State.Should().Be(NodeState.Leader);
+            node2.State.Should().Be(NodeState.Follower);
+            node2.HeartbeatsReceived.Should().BeGreaterThanOrEqualTo(1);
+        }
     }
 }

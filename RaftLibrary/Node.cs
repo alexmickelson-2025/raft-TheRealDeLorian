@@ -13,6 +13,7 @@ namespace RaftLibrary
         public int? VotedFor {get; set;}
         public int TimeLeft {get; set;}
         public Node[] OtherNodes {get; set;}
+        public int HeartbeatsReceived { get; set; }
         System.Timers.Timer t;
         Random r = new();
 
@@ -75,14 +76,25 @@ namespace RaftLibrary
             if (supporters.Count > OtherNodes.Length * 0.5)
             {
                 State = NodeState.Leader;
+                foreach (Node otherNode in OtherNodes)
+                {
+                    await otherNode.AppendEntries(new RPCData { SentFrom = Id, Term=CurrentTerm });
+                }
             }
         }
 
         public async Task<bool> AppendEntries(RPCData data)
         {
-            if(data.Entry == null)
+            if(data.Term > CurrentTerm)
+            {
+                CurrentTerm = data.Term;
+                State = NodeState.Follower;
+            }
+
+            if (data.Entry == null || data.Entry == "")
             {
                 LeaderId = data.SentFrom;
+                HeartbeatsReceived++;
             }
             if(data.Term < CurrentTerm)
             {

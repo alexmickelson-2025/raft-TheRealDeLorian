@@ -13,17 +13,17 @@
  
 - [x] 11. Given a candidate server that just became a candidate, it votes for itself.
 - [x] 18. Given a candidate receives an AppendEntries from a previous term, then rejects.
-- [x] 16. Given a candidate, when an election timer expires inside of an election, a new election is started.
+- [] 16. Given a candidate, when an election timer expires inside of an election, a new election is started.
 - [x] 6. When a new election begins, the term is incremented by 1.
 	- [x] 6.1. Create a new node, store id in variable.
 	- [x] 6.2. wait 300 ms
 	- [x] 6.3. reread term (?)
 	- [x] 6.4. assert after is greater (by at least 1)
-- [] 8. Given an election begins, when the candidate gets a majority of votes, it becomes a leader. (think of the easy case; can use two tests for single and multi-node clusters)
+- [x] 8. Given an election begins, when the candidate gets a majority of votes, it becomes a leader. (think of the easy case; can use two tests for single and multi-node clusters)
 - [] 9. Given a candidate receives a majority of votes while waiting for unresponsive node, it still becomes a leader.
-- [] 12. Given a candidate, when it receives an AppendEntries message from a node with a later term, then candidate loses and becomes a follower.
+- [x] 12. Given a candidate, when it receives an AppendEntries message from a node with a later term, then candidate loses and becomes a follower.
 - [] 13. Given a candidate, when it receives an AppendEntries message from a node with an equal term, then candidate loses and becomes a follower.
-- [] 19. When a candidate wins an election, it immediately sends a heart beat.
+- [x] 19. When a candidate wins an election, it immediately sends a heart beat.
 
 
 - [] 1. When a leader is active it sends a heart beat within 50ms.
