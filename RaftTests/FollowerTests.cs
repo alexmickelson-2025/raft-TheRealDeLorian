@@ -11,7 +11,7 @@ namespace RaftTests
         public async Task TestFollowerTermIncrementOnElectionTimeout()
         {
             Node node = new Node([], 1);
-            await node.TimeoutElection();
+            await node.Timeout();
             int term = node.CurrentTerm;
             term.Should().Be(2);
         }

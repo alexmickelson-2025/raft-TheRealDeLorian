@@ -45,12 +45,12 @@ namespace RaftLibrary
 
         private async void OnTimerRunout(Object source, ElapsedEventArgs e)
         {
-            await TimeoutElection();
+            await Timeout();
             ResetTimer();
         }
 
 
-        public async Task TimeoutElection()
+        public async Task Timeout()
         {
             CurrentTerm++;
             State = NodeState.Candidate;
