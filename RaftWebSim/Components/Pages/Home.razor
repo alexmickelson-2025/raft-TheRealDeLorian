@@ -24,8 +24,8 @@
         var node3 = new Node([], 3); //consider initializing with other nodes and the own node id
 
         var simulation1 = new SimNode(node1);
-        var simulation2 = new SimNode(node1);
-        var simulation3 = new SimNode(node1);
+        var simulation2 = new SimNode(node2);
+        var simulation3 = new SimNode(node3);
 
         node1.OtherNodes = [simulation2, simulation3];
         node2.OtherNodes = [simulation1, simulation3];
