@@ -73,7 +73,6 @@ namespace RaftTests
         [Fact]
         public async Task WhenElectionTimeResetsItIsRandom()
         {
-            //call the test like 100 times and make sure that each time is different
             List<Node> nodes = new();
             List<int> times = new();
 
@@ -108,7 +107,7 @@ namespace RaftTests
             voteResult.Should().Be(false);
         }
 
-        //Testing #TODO CHANGE THIS
+        //Testing #idk
         [Fact]
         public async Task FollowerWhoHasVotedThisTermVotesNoToAnyoneElse()
         {

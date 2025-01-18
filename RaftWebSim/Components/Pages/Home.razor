@@ -13,7 +13,8 @@
             @node.Id
             <div>
                 @node.InnerNode.State
-            </div>aria-valuenow=@(Math.Abs(timeout))
+            </div>
+            @* aria-valuenow=@(Math.Abs(timeout)) *@
 
         </div>
     }
@@ -40,9 +41,9 @@
         nodes = [simulation1, simulation2, simulation3];
         StateHasChanged();
 
-        node1.StartElection();
-        node2.StartElection();
-        node3.StartElection();
+        // node1.StartElection();
+        // node2.StartElection();
+        // node3.StartElection();
         timer = new Timer(_ =>
         {
             Console.WriteLine("here");
