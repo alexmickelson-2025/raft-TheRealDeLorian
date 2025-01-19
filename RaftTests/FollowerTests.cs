@@ -54,7 +54,10 @@ namespace RaftTests
         [Fact]
         public async Task WhenNoEmptyAppendIsReceivedAnElectionIsStarted()
         {
-            Node node = new Node([new Node([], 2)], 1);
+            Node node = new Node([], 1);
+            INode node2 = Substitute.For<INode>();
+            node.OtherNodes = [node2];
+            node.Start();
             Thread.Sleep(500);
             NodeState state = node.State;
             state.Should().Be(NodeState.Candidate);
@@ -65,6 +68,7 @@ namespace RaftTests
         public async Task WhenElectionTimeResetsItIsBetween150msAnd300ms()
         {
             Node node = new([], 1);
+            node.Start();
             Thread.Sleep(350);
             node.TimeLeft.Should().BeLessThan(301);
             node.TimeLeft.Should().BeGreaterThan(149);
@@ -73,12 +77,14 @@ namespace RaftTests
         [Fact]
         public async Task WhenElectionTimeResetsItIsRandom()
         {
+            //call the test like 100 times and make sure that each time is different
             List<Node> nodes = new();
             List<int> times = new();
 
             for (int i = 0; i < 100; i++)
             {
                 Node node = new([], 1);
+                node.Start();
                 nodes.Add(node);
                 times.Add(node.TimeLeft);
             }
@@ -107,7 +113,7 @@ namespace RaftTests
             voteResult.Should().Be(false);
         }
 
-        //Testing #idk
+        //Testing #TODO CHANGE THIS
         [Fact]
         public async Task FollowerWhoHasVotedThisTermVotesNoToAnyoneElse()
         {

@@ -22,12 +22,12 @@ namespace RaftLibrary
             Id = nodeId;
             OtherNodes = otherNodes;
             CurrentTerm = 1;
-            StartElectionTimer();
+            // StartElectionTimer(); //Make this like timer.Start() where you have to start up the node first every time you make it. or come up with some other way to make the timer not start int the ctor
         }
 
         //This method was largely inspired by official Microsoft C# documentation:
         // https://learn.microsoft.com/en-us/dotnet/api/system.timers.timer?view=net-9.0
-        public async Task StartElectionTimer()
+        public async Task Start()
         {
             t = new System.Timers.Timer();
             t.Elapsed += OnTimerRunout;
@@ -62,7 +62,7 @@ namespace RaftLibrary
         {
             if (OtherNodes.Length == 0)
             {
-                State = NodeState.Leader; //consider making this winelection?
+                await WinElection();
             }
             List<INode> supporters = new();
             foreach (INode otherNode in OtherNodes)
@@ -75,11 +75,16 @@ namespace RaftLibrary
             }
             if (supporters.Count > OtherNodes.Length * 0.5)
             {
-                State = NodeState.Leader;
-                foreach (INode otherNode in OtherNodes)
-                {
-                    await otherNode.AppendEntries(new RPCData { SentFrom = Id, Term = CurrentTerm });
-                }
+                await WinElection();
+            }
+        }
+
+        public async Task WinElection()
+        {
+            State = NodeState.Leader; 
+            foreach (INode otherNode in OtherNodes)
+            {
+                await otherNode.AppendEntries(new RPCData { SentFrom = Id, Term = CurrentTerm });
             }
         }
 
@@ -96,6 +101,7 @@ namespace RaftLibrary
                 LeaderId = data.SentFrom;
                 HeartbeatsReceived++;
             }
+            
             if (data.Term < CurrentTerm)
             {
                 return false;

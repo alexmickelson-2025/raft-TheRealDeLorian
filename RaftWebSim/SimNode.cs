@@ -30,9 +30,9 @@ namespace RaftWebSim
             return ((INode)InnerNode).RequestVote(term, candidateId);
         }
 
-        public Task StartElectionTimer()
+        public Task Start()
         {
-            return ((INode)InnerNode).StartElectionTimer();
+            return ((INode)InnerNode).Start();
         }
 
         public Task Timeout()

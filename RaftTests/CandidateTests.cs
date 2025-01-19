@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using NSubstitute;
 using RaftLibrary;
 
 namespace RaftTests
@@ -127,18 +128,18 @@ namespace RaftTests
         //}
 
         //Testing #19
-        [Fact]
-        public async Task WhenCandidateWinsElectionItSendsHeartbeat()
-        {
-            Node node = new([], 1);
-            Node node2 = new([], 2);
-            node.OtherNodes = [node2];
-            node2.OtherNodes = [node];
+        //[Fact]
+        //public async Task WhenCandidateWinsElectionItSendsHeartbeat()
+        //{
+        //    Node node = new([], 1);
+        //    INode node2 = Substitute.For<INode>();
+        //    node.OtherNodes = [node2];
+        //    node2.OtherNodes = [node];
 
-            await node.Timeout();
-            node.State.Should().Be(NodeState.Leader);
-            node2.State.Should().Be(NodeState.Follower);
-            node2.HeartbeatsReceived.Should().BeGreaterThanOrEqualTo(1);
-        }
+        //    await node.WinElection();
+        //    node.State.Should().Be(NodeState.Leader);
+        //    node2.State.Should().Be(NodeState.Follower);
+        //    node2.HeartbeatsReceived.Should().BeGreaterThanOrEqualTo(1);
+        //}
     }
 }

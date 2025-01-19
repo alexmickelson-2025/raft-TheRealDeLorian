@@ -14,7 +14,7 @@ namespace RaftLibrary
 
         Task<bool> AppendEntries(RPCData data);
         Task<bool> RequestVote(int term, int candidateId);
-        Task StartElectionTimer();
+        Task Start();
         Task Timeout();
     }
 }
