@@ -5,7 +5,7 @@ namespace RaftWebSim
     public class SimNode : INode
     {
 
-        public readonly Node InnerNode;
+        public Node InnerNode { get; }
         public SimNode(Node node)
         {
             InnerNode = node;
@@ -39,5 +39,7 @@ namespace RaftWebSim
         {
             return ((INode)InnerNode).Timeout();
         }
+
+        
     }
 }

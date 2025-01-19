@@ -205,11 +205,11 @@ else
 
   public void UpdateTimer()
   {
-    @* timer?.Dispose();
+    timer?.Dispose();
     timer = new Timer(_ =>
     {
       InvokeAsync(StateHasChanged);
-    }, null, 0, 100 * (int)RaftNode.NodeIntervalScalar); *@
+    }, null, 0, 100 * (int)RaftNode.NodeIntervalScalar);
   }
   public void StopNodes()
   {

@@ -2,9 +2,26 @@
 @using RaftLibrary
 @rendermode InteractiveServer
 
+
 <PageTitle>Home</PageTitle>
 
-<button @onclick="StartSim">start</button>
+<button class="btn btn-primary" @onclick=StartSim>Start Simulation</button>
+
+
+<div class="row">
+    <div class="col">
+        <div>
+            <label for="speed">
+                Election timeout between @(FormatMilliSeconds(150 * Node.NodeIntervalScalar)) and
+                @(FormatMilliSeconds(300 *
+                    Node.NodeIntervalScalar)) seconds
+                <br>
+                <input type="range" id="speed" name="speed" min="1" max="150" @bind:event="oninput"
+                    @bind=Node.NodeIntervalScalar @onchange=UpdateTimer />
+            </label>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     @foreach (var node in nodes)
@@ -14,7 +31,6 @@
             <div>
                 @node.InnerNode.State
             </div>
-            @* aria-valuenow=@(Math.Abs(timeout)) *@
 
         </div>
     }
@@ -24,6 +40,16 @@
 @code {
     List<SimNode> nodes = [];
     private Timer? timer;
+
+    public void UpdateTimer()
+    {
+        timer?.Dispose();
+        timer = new Timer(_ =>
+        {
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 100 * (int)Node.NodeIntervalScalar);
+    }
+
     void StartSim()
     {
         var node1 = new Node([], 1); //consider initializing with other nodes and the own node id Node([], 1)
@@ -46,10 +72,20 @@
         // node3.StartElection();
         timer = new Timer(_ =>
         {
-            Console.WriteLine("here");
             InvokeAsync(StateHasChanged);
         }, null, 0, 200);
 
 
     }
+
+
+
+
+
+
+    public static string FormatMilliSeconds(double milliSeconds)
+    {
+        return $"{milliSeconds / 1000.0:F1}";
+    }
+
 }

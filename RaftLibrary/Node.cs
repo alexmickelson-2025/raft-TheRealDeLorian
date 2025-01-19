@@ -14,6 +14,7 @@ namespace RaftLibrary
         public int TimeLeft { get; set; }
         public INode[] OtherNodes { get; set; }
         public int HeartbeatsReceived { get; set; }
+        public static int NodeIntervalScalar {get; set;}
         System.Timers.Timer t;
         Random r = new();
 
