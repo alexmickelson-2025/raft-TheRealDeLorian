@@ -128,5 +128,10 @@ namespace RaftLibrary
             VotedFor = candidateId;
             return true;
         }
+
+        public async Task SendCommand(ClientCommandData data)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

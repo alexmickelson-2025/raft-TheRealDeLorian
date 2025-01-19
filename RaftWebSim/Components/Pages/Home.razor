@@ -20,8 +20,39 @@
                     @bind=Node.NodeIntervalScalar @onchange=UpdateTimer />
             </label>
         </div>
+        <div>
+            <label for="NetworkRequestDelay">
+                Network Delay @FormatMilliSeconds(SimNode.NetworkRequestDelay) seconds
+                <br>
+                <input type="range" id="NetworkRequestDelay" name="NetworkRequestDelay" min="10" max="10000"
+                    @bind:event="oninput" @bind=SimNode.NetworkRequestDelay />
+            </label>
+        </div>
+    </div>
+    <div class="col">
+        <div class="border p-3 rounded-3">
+            <label>
+                Key <input class="form-control" @bind=userInputKey />
+            </label>
+            <label>
+                Value <input class="form-control" @bind=userInputValue />
+            </label>
+            <hr>
+            @foreach (var node in nodes)
+            {
+                <button class="btn btn-outline-primary mx-1" @onclick="() => SendCommand(node.Id)">Send to Node
+                    @node.Id</button>
+            }
+            <br>
+            <div>
+                @commandStatus
+            </div>
+        </div>
     </div>
 </div>
+
+
+
 
 <div class="row">
     @foreach (var node in nodes)
@@ -29,9 +60,17 @@
         <div class="p-3 col-4">
             @node.Id
             <div>
+                State:
                 @node.InnerNode.State
             </div>
-
+            <div>
+                Term:
+                @node.InnerNode.CurrentTerm
+            </div>
+             <div>
+                Leader:
+                @node.InnerNode.LeaderId
+            </div>
         </div>
     }
 </div>
@@ -40,6 +79,22 @@
 @code {
     List<SimNode> nodes = [];
     private Timer? timer;
+    string userInputKey = "";
+    string userInputValue = "";
+    string commandStatus = "";
+
+   async Task SendCommand(int destinationId)
+  {
+    commandStatus = "sending";
+    var dest = nodes.FirstOrDefault(n => n.Id == destinationId);
+
+    var command = new ClientCommandData(
+    type: ClientCommandType.Set,
+    key: userInputKey,
+    value: userInputValue
+   );
+    await dest.SendCommand(command);
+  }
 
     public void UpdateTimer()
     {

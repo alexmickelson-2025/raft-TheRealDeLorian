@@ -11,6 +11,7 @@ namespace RaftWebSim
             InnerNode = node;
         }
 
+        public bool SimulationRunning { get; private set; } = false;
         public int CurrentTerm { get => ((INode)InnerNode).CurrentTerm; set => ((INode)InnerNode).CurrentTerm = value; }
         public int HeartbeatsReceived { get => ((INode)InnerNode).HeartbeatsReceived; set => ((INode)InnerNode).HeartbeatsReceived = value; }
         public int Id { get => ((INode)InnerNode).Id; set => ((INode)InnerNode).Id = value; }
@@ -19,6 +20,7 @@ namespace RaftWebSim
         public NodeState State { get => ((INode)InnerNode).State; set => ((INode)InnerNode).State = value; }
         public int TimeLeft { get => ((INode)InnerNode).TimeLeft; set => ((INode)InnerNode).TimeLeft = value; }
         public int? VotedFor { get => ((INode)InnerNode).VotedFor; set => ((INode)InnerNode).VotedFor = value; }
+        public static int NetworkRequestDelay { get; set; } = 1000;
 
         public Task<bool> AppendEntries(RPCData data)
         {
@@ -40,6 +42,13 @@ namespace RaftWebSim
             return ((INode)InnerNode).Timeout();
         }
 
-        
+        public async Task SendCommand(ClientCommandData data)
+        {
+            if (!SimulationRunning)
+                return;
+            await InnerNode.SendCommand(data);
+        }
+
+
     }
 }
