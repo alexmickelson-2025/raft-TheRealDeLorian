@@ -175,6 +175,21 @@ namespace RaftTests
             node.LeaderId.Should().Be(2);
         }
 
+        [Fact]
+        public async Task WhenNodeIsLeaderItReceivesClientRequests()
+        {
+            Node node = new Node([], 1);
+            node.State = NodeState.Leader;
+            INode node1 = Substitute.For<INode>();
+            node.OtherNodes = [node1];
+            RPCData data = new() {SentFrom = 2, Entry = "New log", Term = 1};
+            await node.AppendEntries(data); 
+            node.Log.Should().NotBeNull();
+
+            // node.Log.Count.Should().Be(1);
+        }
+
+
 
 
 

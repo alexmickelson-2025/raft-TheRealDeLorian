@@ -11,6 +11,7 @@ namespace RaftLibrary
         NodeState State { get; set; }
         int TimeLeft { get; set; }
         int? VotedFor { get; set; }
+        List<RPCData> Log {get; set;}
 
         Task<bool> AppendEntries(RPCData data);
         Task<bool> RequestVote(int term, int candidateId);

@@ -15,6 +15,7 @@ namespace RaftLibrary
         public INode[] OtherNodes { get; set; }
         public int HeartbeatsReceived { get; set; }
         public static int NodeIntervalScalar {get; set;}
+        public List<RPCData> Log {get; set;}
         System.Timers.Timer t;
         Random r = new();
 
@@ -23,6 +24,7 @@ namespace RaftLibrary
             Id = nodeId;
             OtherNodes = otherNodes;
             CurrentTerm = 1;
+            Log = new();
             // StartElectionTimer(); //Make this like timer.Start() where you have to start up the node first every time you make it. or come up with some other way to make the timer not start int the ctor
         }
 
@@ -91,6 +93,10 @@ namespace RaftLibrary
 
         public async Task<bool> AppendEntries(RPCData data)
         {
+            if(State == NodeState.Leader)
+            {
+                Log.Add(data);
+            }
             if (data.Term > CurrentTerm)
             {
                 CurrentTerm = data.Term;
