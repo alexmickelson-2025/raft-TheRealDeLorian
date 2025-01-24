@@ -2,7 +2,7 @@
 
 namespace RaftWebSim
 {
-    public class SimNode : INode
+    public class SimNode : INode // question: why did alex choose to implement interface through innernode rather than implementing it normally?
     {
 
         public Node InnerNode { get; }
@@ -21,6 +21,7 @@ namespace RaftWebSim
         public int TimeLeft { get => ((INode)InnerNode).TimeLeft; set => ((INode)InnerNode).TimeLeft = value; }
         public int? VotedFor { get => ((INode)InnerNode).VotedFor; set => ((INode)InnerNode).VotedFor = value; }
         public static int NetworkRequestDelay { get; set; } = 1000;
+        public List<RPCData> Log { get => ((INode)InnerNode).Log; set => ((INode)InnerNode).Log = value; }
 
         public Task<bool> AppendEntries(RPCData data)
         {
