@@ -11,7 +11,8 @@ namespace RaftLibrary
         NodeState State { get; set; }
         int TimeLeft { get; set; }
         int NextIndex { get; set; }
-        public List<(int nodeId, int nextIndex)> NextIndicesToSend { get; set; }
+        int CommitIndex { get; set; }
+        List<(int nodeId, int nextIndex)> NextIndicesToSend { get; set; }
 
         int? VotedFor { get; set; }
         List<RPCData> Log {get; set;}

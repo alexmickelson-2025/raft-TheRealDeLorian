@@ -18,6 +18,8 @@ namespace RaftLibrary
         public int HeartbeatsReceived { get; set; }
         public static int NodeIntervalScalar {get; set;}
         public List<RPCData> Log { get; set; } = new();
+        public int CommitIndex { get; set; }
+
         System.Timers.Timer t;
         Random r = new();
 

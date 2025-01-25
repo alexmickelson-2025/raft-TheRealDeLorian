@@ -99,6 +99,26 @@ public class LogTests
         leader.NextIndicesToSend = new List<(int nodeId, int nextIndex)>();
     }
 
+    // # Testing 6
+    [Fact]
+    public async Task HighestCommittedIndexFromLeaderIsIncludedInAllAppendEntries()
+    {
+        Node leader = new([], 1);
+        leader.State = NodeState.Leader;
+        INode node1 = Substitute.For<INode>();
+        node1.CurrentTerm = 1;
+        node1.Log = new();
+        INode node2 = Substitute.For<INode>();
+        node2.CurrentTerm = 1;
+        node2.Log = new();
+
+        leader.OtherNodes = [node1, node2];
+
+        RPCData data = new() { SentFrom = 2, Entry = "New log", Term = 1, LeaderCommitIndex = leader.CommitIndex };
+        await node1.AppendEntries(data);
+
+    }
+
 
 
 }

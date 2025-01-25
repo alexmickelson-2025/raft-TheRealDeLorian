@@ -11,5 +11,6 @@ namespace RaftLibrary
         public int Term { get; set; }
         public string Entry { get; set; }
         public int SentFrom { get; set; }
+        public int LeaderCommitIndex { get; set; }
     }
 }
