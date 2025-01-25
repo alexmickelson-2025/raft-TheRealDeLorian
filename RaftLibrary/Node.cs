@@ -12,6 +12,7 @@ namespace RaftLibrary
         public int CurrentTerm { get; set; } = 1;
         public int? VotedFor { get; set; }
         public int TimeLeft { get; set; }
+        public int NextIndex { get; set; } = 1;
         public INode[] OtherNodes { get; set; }
         public int HeartbeatsReceived { get; set; }
         public static int NodeIntervalScalar {get; set;}
@@ -134,9 +135,11 @@ namespace RaftLibrary
 
         public async Task RequestFromClient(string command)
         {
+            var rpcData = new RPCData() { Entry = command, SentFrom = Id, Term = CurrentTerm };
+            Log.Add(rpcData);
+            
             foreach(INode follower in OtherNodes)
             {
-                var rpcData = new RPCData() { Entry = command, SentFrom = Id, Term = CurrentTerm };
                 await follower.AppendEntries(rpcData);
             }
         }

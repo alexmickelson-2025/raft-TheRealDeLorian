@@ -10,6 +10,7 @@ namespace RaftLibrary
         INode[] OtherNodes { get; set; }
         NodeState State { get; set; }
         int TimeLeft { get; set; }
+        int NextIndex { get; set; }
         int? VotedFor { get; set; }
         List<RPCData> Log {get; set;}
 

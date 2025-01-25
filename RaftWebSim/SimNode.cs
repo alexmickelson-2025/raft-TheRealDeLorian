@@ -22,6 +22,7 @@ namespace RaftWebSim
         public int? VotedFor { get => ((INode)InnerNode).VotedFor; set => ((INode)InnerNode).VotedFor = value; }
         public static int NetworkRequestDelay { get; set; } = 1000;
         public List<RPCData> Log { get => ((INode)InnerNode).Log; set => ((INode)InnerNode).Log = value; }
+        public int NextIndex { get => ((INode)InnerNode).NextIndex; set => ((INode)InnerNode).NextIndex = value; }
 
         public Task<bool> AppendEntries(RPCData data)
         {
