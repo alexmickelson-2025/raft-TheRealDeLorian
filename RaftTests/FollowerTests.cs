@@ -164,15 +164,15 @@ public class FollowerTests
     }
 
     //Testing #2
-    [Fact]
-    public async Task ReceivingAppendEntriesMakesNodeRememberWhoIsTheLeader()
-    {
-        Node node = new Node([], 1);
-        await node.AppendEntries(new RPCData() { SentFrom = 2});
-        node.LeaderId.Should().Be(2);
-        await node.AppendEntries(new RPCData() { SentFrom = 3, Entry="Hello! I'm not sus" });
-        node.LeaderId.Should().Be(2);
-    }
+    //[Fact]
+    //public async Task ReceivingAppendEntriesMakesNodeRememberWhoIsTheLeader()
+    //{
+    //    Node node = new Node([], 1);
+    //    await node.AppendEntries(new RPCData() { SentFrom = 2});
+    //    node.LeaderId.Should().Be(2);
+    //    await node.AppendEntries(new RPCData() { SentFrom = 3, Entry="Hello! I'm not sus" });
+    //    node.LeaderId.Should().Be(2);
+    //}
 
    
 

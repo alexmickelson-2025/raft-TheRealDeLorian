@@ -9,13 +9,13 @@ namespace RaftLibrary
         public int Id { get; set; }
         public int LeaderId { get; set; }
         public NodeState State { get; set; }
-        public int CurrentTerm { get; set; }
+        public int CurrentTerm { get; set; } = 1;
         public int? VotedFor { get; set; }
         public int TimeLeft { get; set; }
         public INode[] OtherNodes { get; set; }
         public int HeartbeatsReceived { get; set; }
         public static int NodeIntervalScalar {get; set;}
-        public List<RPCData> Log {get; set;}
+        public List<RPCData> Log { get; set; } = new();
         System.Timers.Timer t;
         Random r = new();
 
@@ -23,8 +23,6 @@ namespace RaftLibrary
         {
             Id = nodeId;
             OtherNodes = otherNodes;
-            CurrentTerm = 1;
-            Log = new();
             // StartElectionTimer(); //Make this like timer.Start() where you have to start up the node first every time you make it. or come up with some other way to make the timer not start int the ctor
         }
 
@@ -93,10 +91,11 @@ namespace RaftLibrary
 
         public async Task<bool> AppendEntries(RPCData data)
         {
-            if(State == NodeState.Leader)
+            if (data.Term < CurrentTerm)
             {
-                Log.Add(data);
+                return false;
             }
+            
             if (data.Term > CurrentTerm)
             {
                 CurrentTerm = data.Term;
@@ -108,11 +107,9 @@ namespace RaftLibrary
                 LeaderId = data.SentFrom;
                 HeartbeatsReceived++;
             }
-            
-            if (data.Term < CurrentTerm)
-            {
-                return false;
-            }
+
+            Log.Add(data);
+
             return true;
         }
 
@@ -137,10 +134,11 @@ namespace RaftLibrary
 
         public async Task RequestFromClient(string command)
         {
-            //foreach(Node follower in OtherNodes)
-            //{
-            //    AppendEntries(new RPCData() { Entry = command, SentFrom = Id, Term = CurrentTerm });
-            //}
+            foreach(INode follower in OtherNodes)
+            {
+                var rpcData = new RPCData() { Entry = command, SentFrom = Id, Term = CurrentTerm };
+                await follower.AppendEntries(rpcData);
+            }
         }
 
         public async Task SendCommand(ClientCommandData data)

@@ -24,7 +24,12 @@ public class LogTests
         Node leader = new Node([], 1);
         leader.State = NodeState.Leader;
         INode node1 = Substitute.For<INode>();
+        node1.CurrentTerm = 1;
+        node1.Log = new();
         INode node2 = Substitute.For<INode>();
+        node2.CurrentTerm = 1;
+        node2.Log = new();
+
         leader.OtherNodes = [node1, node2];
 
         await leader.RequestFromClient("Add 2");
