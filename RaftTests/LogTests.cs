@@ -64,8 +64,6 @@ public class LogTests
     public async Task WhenLeaderWinsElectionAllFollowersNextIndexEqualsTheLeadersLastIndexPlusOne()
     {
         Node leader = new Node([], 1);
-        await leader.WinElection();
-        leader.State.Should().Be(NodeState.Leader);
 
         INode node1 = Substitute.For<INode>();
         node1.CurrentTerm = 1;
@@ -75,6 +73,9 @@ public class LogTests
         node2.Log = new();
 
         leader.OtherNodes = [node1, node2];
+
+        await leader.WinElection();
+        leader.State.Should().Be(NodeState.Leader);
 
         node1.NextIndex.Should().Be(leader.Log.Count + 1);
         node2.NextIndex.Should().Be(leader.Log.Count + 1);

@@ -87,6 +87,7 @@ namespace RaftLibrary
             foreach (INode otherNode in OtherNodes)
             {
                 await otherNode.AppendEntries(new RPCData { SentFrom = Id, Term = CurrentTerm });
+                otherNode.NextIndex = Log.Count + 1;
             }
         }
 
