@@ -133,8 +133,40 @@ public class LogTests
     }
 
     // Testing #8
-    [Fact]
-    public async Task 
+    //[Fact]
+    public async Task LeaderCommitsLogsOnMajorityConfirmation()
+    {
+        Node leader = new([], 1);
+        leader.State = NodeState.Leader;
+        INode node1 = Substitute.For<INode>();
+        node1.CurrentTerm = 1;
+        node1.Log = new();
+        INode node2 = Substitute.For<INode>();
+        node2.CurrentTerm = 1;
+        node2.Log = new();
+        INode node3 = Substitute.For<INode>();
+        node3.CurrentTerm = 1;
+        node3.Log = new();
+        INode node4 = Substitute.For<INode>();
+        node4.CurrentTerm = 1;
+        node4.Log = new();
+
+        leader.OtherNodes = [node1, node2, node3, node4];
+
+        leader.CommitIndex.Should().Be(0);
+        RPCData data = new() { SentFrom = 2, Entry = "New log", Term = 1, LeaderCommitIndex = leader.CommitIndex };
+        node1.AppendEntries(data).Returns(true);
+        node2.AppendEntries(data).Returns(true);
+        node3.AppendEntries(data).Returns(true);
+        node4.AppendEntries(data).Returns(false);
+        foreach (INode node in leader.OtherNodes)
+        {
+            await node.AppendEntries(data);
+        }
+
+        leader.CommitIndex.Should().Be(1);
+
+    }
 
 
 }
