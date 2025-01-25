@@ -79,10 +79,6 @@ public class LogTests
 
         node1.NextIndex.Should().Be(leader.Log.Count + 1);
         node2.NextIndex.Should().Be(leader.Log.Count + 1);
-
-
-
-
     }
 
 }
