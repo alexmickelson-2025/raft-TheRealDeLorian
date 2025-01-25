@@ -133,7 +133,7 @@ public class LogTests
     }
 
     // Testing #8
-    //[Fact]
+    [Fact]
     public async Task LeaderCommitsLogsOnMajorityConfirmation()
     {
         Node leader = new([], 1);
