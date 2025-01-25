@@ -81,7 +81,7 @@ public class LogTests
         node2.NextIndex.Should().Be(leader.Log.Count + 1);
     }
 
-    // # Testing #5
+    // Testing #5
     [Fact]
     public async Task LeadersMaintainNextIndexToSendForEachFollower()
     {
@@ -99,7 +99,7 @@ public class LogTests
         leader.NextIndicesToSend = new List<(int nodeId, int nextIndex)>();
     }
 
-    // # Testing 6
+    // Testing #6
     [Fact]
     public async Task HighestCommittedIndexFromLeaderIsIncludedInAllAppendEntries()
     {
@@ -119,7 +119,7 @@ public class LogTests
 
     }
 
-    // # Testing 7
+    // Testing #7
     [Fact]
     public async Task FollowerUpdatesStateMachineUponLearningOfNewCommittedEntry()
     {
@@ -130,10 +130,11 @@ public class LogTests
         await follower.AppendEntries(data);
 
         follower.CommitIndex.Should().Be(4);
+    }
 
-
-    }        
-
+    // Testing #8
+    [Fact]
+    public async Task 
 
 
 }
