@@ -7,7 +7,7 @@ namespace RaftTests;
 public class LogTests
 {
     [Fact]
-    public async Task WhenNodeIsLeaderItReceivesClientRequests()
+    public async Task WhenNodeIsLeaderItReceivesAppendEntriesRequestsFromFollowers()
     {
         Node leader = new Node([], 1);
         leader.State = NodeState.Leader;
@@ -27,8 +27,9 @@ public class LogTests
         INode node2 = Substitute.For<INode>();
         leader.OtherNodes = [node1, node2];
 
-        //leader.RequestFromClient("Add 2");
-        //
+        await leader.RequestFromClient("Add 2");
+        node1.Log.Should().NotBeNull();
+        node2.Log.Should().NotBeNull();
     }
 
 }

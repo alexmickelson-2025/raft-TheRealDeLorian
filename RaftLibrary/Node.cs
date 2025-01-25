@@ -135,6 +135,14 @@ namespace RaftLibrary
             return true;
         }
 
+        public async Task RequestFromClient(string command)
+        {
+            //foreach(Node follower in OtherNodes)
+            //{
+            //    AppendEntries(new RPCData() { Entry = command, SentFrom = Id, Term = CurrentTerm });
+            //}
+        }
+
         public async Task SendCommand(ClientCommandData data)
         {
             throw new NotImplementedException();
