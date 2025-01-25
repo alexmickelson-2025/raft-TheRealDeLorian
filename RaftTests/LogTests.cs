@@ -49,7 +49,7 @@ public class LogTests
 
         leader.Log.Count.Should().Be(1);
     }
-    
+
     // Testing #3
     [Fact]
     public async Task WhenNodeIsNewLogIsEmpty()
@@ -118,6 +118,21 @@ public class LogTests
         await node1.AppendEntries(data);
 
     }
+
+    // # Testing 7
+    [Fact]
+    public async Task FollowerUpdatesStateMachineUponLearningOfNewCommittedEntry()
+    {
+        Node follower = new([], 1);
+        follower.CommitIndex.Should().Be(0);
+
+        RPCData data = new() { SentFrom = 2, Entry = "New log", Term = 1, LeaderCommitIndex = 4 };
+        await follower.AppendEntries(data);
+
+        follower.CommitIndex.Should().Be(4);
+
+
+    }        
 
 
 

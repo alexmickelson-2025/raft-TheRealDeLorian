@@ -96,6 +96,7 @@ namespace RaftLibrary
 
         public async Task<bool> AppendEntries(RPCData data)
         {
+            
             if (data.Term < CurrentTerm)
             {
                 return false;
@@ -113,6 +114,7 @@ namespace RaftLibrary
                 HeartbeatsReceived++;
             }
 
+            CommitIndex = data.LeaderCommitIndex;
             Log.Add(data);
 
             return true;
