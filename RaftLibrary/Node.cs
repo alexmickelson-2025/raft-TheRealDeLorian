@@ -13,6 +13,7 @@ namespace RaftLibrary
         public int? VotedFor { get; set; }
         public int TimeLeft { get; set; }
         public int NextIndex { get; set; } = 1;
+        public List<(int nodeId, int nextIndex)> NextIndicesToSend { get; set; }
         public INode[] OtherNodes { get; set; }
         public int HeartbeatsReceived { get; set; }
         public static int NodeIntervalScalar {get; set;}
