@@ -7,6 +7,26 @@ namespace RaftTests;
 public class LogTests
 {
     [Fact]
+    public async Task LeaderSendsHeartbeatEvery50ms()
+    {
+        Node leader = new Node([], 1);
+        leader.State = NodeState.Leader;
+        INode node1 = Substitute.For<INode>();
+        leader.OtherNodes = [node1];
+
+        int heartbeatsReceivedBeforeStart = node1.HeartbeatsReceived;
+        //assuming it already won the election, there should be a second timer that takes care of heartbeat signals. 
+        //leader.StartHeartbeatTimer();
+        Thread.Sleep(70);
+        node1.HeartbeatsReceived.Should().BeGreaterThan(0);
+        int heartbeatsreceivedafterfirstcheck = node1.HeartbeatsReceived;
+        Thread.Sleep(70);
+        node1.HeartbeatsReceived.Should().BeGreaterThan(heartbeatsreceivedafterfirstcheck);
+
+    }
+
+
+    [Fact]
     public async Task WhenNodeIsLeaderItReceivesAppendEntriesRequestsFromFollowers()
     {
         Node leader = new Node([], 1);

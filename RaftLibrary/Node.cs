@@ -19,9 +19,11 @@ namespace RaftLibrary
         public static int NodeIntervalScalar {get; set;}
         public List<RPCData> Log { get; set; } = new();
         public int CommitIndex { get; set; }
+        public bool IsPaused { get; set; }
 
-        System.Timers.Timer t;
+        System.Timers.Timer ElectionTimer;
         Random r = new();
+        System.Timers.Timer HeartbeatTimer;
 
         public Node(Node[] otherNodes, int nodeId)
         {
@@ -34,18 +36,18 @@ namespace RaftLibrary
         // https://learn.microsoft.com/en-us/dotnet/api/system.timers.timer?view=net-9.0
         public async Task Start()
         {
-            t = new System.Timers.Timer();
-            t.Elapsed += OnTimerRunout;
-            t.AutoReset = true;
-            t.Enabled = true;
+            ElectionTimer = new System.Timers.Timer();
+            ElectionTimer.Elapsed += OnTimerRunout;
+            ElectionTimer.AutoReset = true;
+            ElectionTimer.Enabled = true;
             ResetTimer();
         }
 
         private void ResetTimer()
         {
             TimeLeft = r.Next(150, 301);
-            t.Interval = TimeLeft;
-            t.Start();
+            ElectionTimer.Interval = TimeLeft;
+            ElectionTimer.Start();
         }
 
         private async void OnTimerRunout(Object source, ElapsedEventArgs e)
@@ -96,7 +98,10 @@ namespace RaftLibrary
 
         public async Task<bool> AppendEntries(RPCData data)
         {
-            
+            if(IsPaused)
+            {
+                return false;
+            }
             if (data.Term < CurrentTerm)
             {
                 return false;
@@ -153,6 +158,16 @@ namespace RaftLibrary
         public async Task SendCommand(ClientCommandData data)
         {
             throw new NotImplementedException();
+        }
+
+        public void Pause()
+        {
+            IsPaused = true;
+        }
+
+        public void Resume()
+        {
+            IsPaused = false;
         }
     }
 }
