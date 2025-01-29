@@ -25,10 +25,9 @@ INode[] otherNodes = otherNodesRaw
 logger.LogInformation("other nodes {nodes}", JsonSerializer.Serialize(otherNodes));
  
  
-var node = new Node(otherNodes)
+var node = new Node([], int.Parse(nodeId))
 {
-  Id = int.Parse(nodeId),
-  logger = app.Services.GetService<ILogger<Node>>()
+    
 };
  
 Node.NodeIntervalScalar = double.Parse(nodeIntervalScalarRaw);
