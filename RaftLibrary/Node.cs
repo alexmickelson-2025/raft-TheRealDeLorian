@@ -29,7 +29,7 @@ namespace RaftLibrary
         {
             Id = nodeId;
             OtherNodes = otherNodes;
-            // StartElectionTimer(); //Make this like timer.Start() where you have to start up the node first every time you make it. or come up with some other way to make the timer not start int the ctor
+            // Start(); //Make this like timer.Start() where you have to start up the node first every time you make it. or come up with some other way to make the timer not start int the ctor
         }
 
         //This method was largely inspired by official Microsoft C# documentation:
@@ -40,7 +40,6 @@ namespace RaftLibrary
             ElectionTimer.Elapsed += OnTimerRunout;
             ElectionTimer.AutoReset = true;
             ElectionTimer.Enabled = true;
-            ResetTimer();
         }
 
         private void ResetTimer()
@@ -63,6 +62,20 @@ namespace RaftLibrary
             State = NodeState.Candidate;
             VotedFor = Id;
             await ConductElection();
+        }
+
+        public async Task StartHeartbeatTimer()
+        {
+            HeartbeatTimer = new System.Timers.Timer(50);
+            HeartbeatTimer.Elapsed += OnHeartbeatTimerRunout;
+            HeartbeatTimer.AutoReset = true;
+            HeartbeatTimer.Enabled = true;
+        }
+
+        private async void OnHeartbeatTimerRunout(object? sender, ElapsedEventArgs e)
+        {
+            RPCData rpcData = new RPCData() { SentFrom=Id, Term=CurrentTerm, LeaderCommitIndex=CommitIndex};
+            await AppendEntries(rpcData);
         }
 
         private async Task ConductElection()
@@ -119,7 +132,7 @@ namespace RaftLibrary
                 HeartbeatsReceived++;
             }
 
-            CommitIndex = data.LeaderCommitIndex;
+            CommitIndex = data.LeaderCommitIndex; 
             Log.Add(data);
 
             return true;

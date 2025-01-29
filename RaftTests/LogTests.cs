@@ -6,6 +6,18 @@ namespace RaftTests;
 
 public class LogTests
 {
+    //testing something, not sure but i need to make sure this is working for #8 to work
+    [Fact]
+    public async Task HeartbeatTimerWorks()
+    {
+        Node leader = new Node([], 1);
+        leader.State = NodeState.Leader;
+        INode node1 = Substitute.For<INode>();
+        leader.OtherNodes = [node1];
+
+        await leader.StartHeartbeatTimer();
+    }
+
     [Fact]
     public async Task LeaderSendsHeartbeatEvery50ms()
     {
@@ -15,8 +27,7 @@ public class LogTests
         leader.OtherNodes = [node1];
 
         int heartbeatsReceivedBeforeStart = node1.HeartbeatsReceived;
-        //assuming it already won the election, there should be a second timer that takes care of heartbeat signals. 
-        //leader.StartHeartbeatTimer();
+        leader.StartHeartbeatTimer();
         Thread.Sleep(70);
         node1.HeartbeatsReceived.Should().BeGreaterThan(0);
         int heartbeatsreceivedafterfirstcheck = node1.HeartbeatsReceived;
@@ -183,9 +194,8 @@ public class LogTests
         {
             await node.AppendEntries(data);
         }
-
+        //need some way of "counting" the votes
         leader.CommitIndex.Should().Be(1);
-
     }
 
 
