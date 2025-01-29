@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RaftLibrary
+namespace RaftLibrary;
+
+public record RPCData
 {
-    public class RPCData
-    {
-        public int Term { get; set; }
-        public string Entry { get; set; }
-        public int SentFrom { get; set; }
-        public int LeaderCommitIndex { get; set; }
-    }
+    public int Term { get; set; }
+    public string Entry { get; set; }
+    public int SentFrom { get; set; }
+    public int LeaderCommitIndex { get; set; }
 }
