@@ -6,24 +6,30 @@ namespace RaftLibrary
 {
     public class Node : INode
     {
+        //Node info
         public int Id { get; set; }
         public int LeaderId { get; set; }
         public NodeState State { get; set; }
+        public StateMachine StateMachine { get; set; } = new();
+        public INode[] OtherNodes { get; set; }
+
+        //Election
         public int CurrentTerm { get; set; } = 1;
         public int? VotedFor { get; set; }
         public int TimeLeft { get; set; }
-        public int NextIndex { get; set; } = 1;
-        public List<(int nodeId, int nextIndex)> NextIndicesToSend { get; set; }
-        public INode[] OtherNodes { get; set; }
-        public int HeartbeatsReceived { get; set; }
-        public static int NodeIntervalScalar {get; set;}
-        public List<RPCData> Log { get; set; } = new();
-        public int CommitIndex { get; set; }
-        public bool IsPaused { get; set; }
-
         System.Timers.Timer ElectionTimer;
         Random r = new();
+
+        //Logging
+        public List<RPCData> Log { get; set; } = new();
+        public int CommitIndex { get; set; }
+        public int HeartbeatsReceived { get; set; }
+        public static int NodeIntervalScalar { get; set; }
+        public int NextIndex { get; set; } = 1;
+        public List<(int nodeId, int nextIndex)> NextIndicesToSend { get; set; }
+        public bool IsPaused { get; set; }
         System.Timers.Timer HeartbeatTimer;
+
 
         public Node(Node[] otherNodes, int nodeId)
         {
@@ -74,7 +80,7 @@ namespace RaftLibrary
 
         private async void OnHeartbeatTimerRunout(object? sender, ElapsedEventArgs e)
         {
-            RPCData rpcData = new RPCData() { SentFrom=Id, Term=CurrentTerm, LeaderCommitIndex=CommitIndex};
+            RPCData rpcData = new RPCData() { SentFrom = Id, Term = CurrentTerm, LeaderCommitIndex = CommitIndex };
             await AppendEntries(rpcData);
         }
 
@@ -101,7 +107,7 @@ namespace RaftLibrary
 
         public async Task WinElection()
         {
-            State = NodeState.Leader; 
+            State = NodeState.Leader;
             foreach (INode otherNode in OtherNodes)
             {
                 await otherNode.AppendEntries(new RPCData { SentFrom = Id, Term = CurrentTerm });
@@ -111,7 +117,7 @@ namespace RaftLibrary
 
         public async Task<bool> AppendEntries(RPCData data)
         {
-            if(IsPaused)
+            if (IsPaused)
             {
                 return false;
             }
@@ -119,7 +125,7 @@ namespace RaftLibrary
             {
                 return false;
             }
-            
+
             if (data.Term > CurrentTerm)
             {
                 CurrentTerm = data.Term;
@@ -132,7 +138,7 @@ namespace RaftLibrary
                 HeartbeatsReceived++;
             }
 
-            CommitIndex = data.LeaderCommitIndex; 
+            CommitIndex = data.LeaderCommitIndex;
             Log.Add(data);
 
             return true;
@@ -161,8 +167,8 @@ namespace RaftLibrary
         {
             var rpcData = new RPCData() { Entry = command, SentFrom = Id, Term = CurrentTerm };
             Log.Add(rpcData);
-            
-            foreach(INode follower in OtherNodes)
+
+            foreach (INode follower in OtherNodes)
             {
                 await follower.AppendEntries(rpcData);
             }
@@ -181,6 +187,29 @@ namespace RaftLibrary
         public void Resume()
         {
             IsPaused = false;
+        }
+
+        public bool Set(string key, int value)
+        {
+            if (State != NodeState.Leader)
+            {
+                return false;
+            }
+            switch (key)
+            {
+                case "X":
+                    StateMachine.AddToX(value);
+                    break;
+                case "Y":
+                    StateMachine.AddToY(value);
+                    break;
+                case "Z":
+                    StateMachine.AddToZ(value);
+                    break;
+                default:
+                    return false;
+            }
+            return true;
         }
     }
 }

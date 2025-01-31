@@ -25,6 +25,7 @@ namespace RaftWebSim
         public int NextIndex { get => ((INode)InnerNode).NextIndex; set => ((INode)InnerNode).NextIndex = value; }
         public List<(int nodeId, int nextIndex)> NextIndicesToSend { get => ((INode)InnerNode).NextIndicesToSend; set => ((INode)InnerNode).NextIndicesToSend = value; }
         public int CommitIndex { get => ((INode)InnerNode).CommitIndex; set => ((INode)InnerNode).CommitIndex = value; }
+        public StateMachine StateMachine { get => ((INode)InnerNode).StateMachine; set => ((INode)InnerNode).StateMachine = value; }
 
         public Task<bool> AppendEntries(RPCData data)
         {

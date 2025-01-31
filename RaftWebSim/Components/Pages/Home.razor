@@ -60,7 +60,7 @@
         <div class="p-3 col-4">
             Node: @node.Id
             <div>
-                State:
+                Role:
                 @node.InnerNode.State
             </div>
             <div>
@@ -71,6 +71,41 @@
                 Leader:
                 @node.InnerNode.LeaderId
             </div>
+            <div>
+                Commit index:
+                @node.CommitIndex
+            </div>
+            <div>
+                State machine state:
+                @node.StateMachine.GetState();
+            </div>
+            @foreach (RPCData entry in node.Log)
+            {
+                <br/>
+                <div class="border">
+
+                <div>
+                    Log index:
+                    @node.Log.IndexOf(entry)
+                </div>
+                 <div>
+                    Term id:
+                    @entry.Term
+                </div>
+                <div>
+                    Committed?
+                    @if (node.Log.IndexOf(entry) <= entry.LeaderCommitIndex)
+                    {
+                        <div>Yes</div>
+                    }
+                    else
+                    {
+                        <div>No</div>
+                    }
+                </div>
+                </div>
+            }
+            
         </div>
     }
 </div>
@@ -122,9 +157,9 @@
         nodes = [simulation1, simulation2, simulation3];
         StateHasChanged();
 
-        // node1.StartElection();
-        // node2.StartElection();
-        // node3.StartElection();
+        node1.Start();
+        node2.Start();
+        node3.Start();
         timer = new Timer(_ =>
         {
             InvokeAsync(StateHasChanged);

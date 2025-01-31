@@ -134,7 +134,7 @@ public class FollowerTests
         IsVotingForNode2.Should().Be(false);
     }
     //Testing #15
-      [Fact]
+    [Fact]
     public async Task FollowerWhoReceivesSecondVoteRequestFromSameCandidateForFutureTermShouldVoteYes()
     {
         var node = new Node([], 1);
@@ -174,7 +174,7 @@ public class FollowerTests
     //    node.LeaderId.Should().Be(2);
     //}
 
-   
+
 
 
 
