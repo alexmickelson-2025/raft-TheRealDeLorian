@@ -27,9 +27,9 @@ namespace RaftWebSim
         public int CommitIndex { get => ((INode)InnerNode).CommitIndex; set => ((INode)InnerNode).CommitIndex = value; }
         public StateMachine StateMachine { get => ((INode)InnerNode).StateMachine; set => ((INode)InnerNode).StateMachine = value; }
 
-        public Task<bool> AppendEntries(RPCData data)
+        public Task<bool> RequestAppendEntries(RPCData data)
         {
-            return ((INode)InnerNode).AppendEntries(data);
+            return ((INode)InnerNode).RequestAppendEntries(data);
         }
 
         public Task<bool> RequestVote(int term, int candidateId)

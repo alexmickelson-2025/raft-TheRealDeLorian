@@ -4,7 +4,21 @@ public class HttpRpcOtherNode : INode
 {
   public int Id { get; }
   public string Url { get; }
-  private HttpClient client = new();
+    public int CurrentTerm { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public int HeartbeatsReceived { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    int INode.Id { get => Id; set => throw new NotImplementedException(); }
+    public int LeaderId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public INode[] OtherNodes { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public StateMachine StateMachine { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public NodeState State { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public int TimeLeft { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public int NextIndex { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public int CommitIndex { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public List<(int nodeId, int nextIndex)> NextIndicesToSend { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public int? VotedFor { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public List<RPCData> Log { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    private HttpClient client = new();
  
   public HttpRpcOtherNode(int id, string url)
   {
@@ -12,7 +26,7 @@ public class HttpRpcOtherNode : INode
     Url = url;
   }
  
-  public async Task RequestAppendEntries(AppendEntriesData request)
+  public async Task RequestAppendEntries(RPCData request)
   {
     try
     {
@@ -36,7 +50,7 @@ public class HttpRpcOtherNode : INode
     }
   }
  
-  public async Task RespondAppendEntries(RespondEntriesData response)
+  public async Task RespondAppendEntries(ResponseEntriesData response)
   {
     try
     {
@@ -64,4 +78,19 @@ public class HttpRpcOtherNode : INode
   {
     await client.PostAsJsonAsync(Url + "/request/command", data);
   }
+
+    public Task<bool> RequestVote(int term, int candidateId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Start()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Timeout()
+    {
+        throw new NotImplementedException();
+    }
 }

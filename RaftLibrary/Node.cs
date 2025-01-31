@@ -64,6 +64,7 @@ namespace RaftLibrary
 
         public async Task Timeout()
         {
+            Console.WriteLine("election...");
             CurrentTerm++;
             State = NodeState.Candidate;
             VotedFor = Id;
@@ -80,8 +81,9 @@ namespace RaftLibrary
 
         private async void OnHeartbeatTimerRunout(object? sender, ElapsedEventArgs e)
         {
+            Console.WriteLine("heartbeat...");
             RPCData rpcData = new RPCData() { SentFrom = Id, Term = CurrentTerm, LeaderCommitIndex = CommitIndex };
-            await AppendEntries(rpcData);
+            await RequestAppendEntries(rpcData);
         }
 
         private async Task ConductElection()
@@ -110,20 +112,20 @@ namespace RaftLibrary
             State = NodeState.Leader;
             foreach (INode otherNode in OtherNodes)
             {
-                await otherNode.AppendEntries(new RPCData { SentFrom = Id, Term = CurrentTerm });
-                otherNode.NextIndex = Log.Count + 1;
+                await otherNode.RequestAppendEntries(new RPCData { SentFrom = Id, Term = CurrentTerm });
+                // otherNode.NextIndex = Log.Count + 1;
             }
         }
 
-        public async Task<bool> AppendEntries(RPCData data)
+        public async Task RequestAppendEntries(RPCData data)
         {
             if (IsPaused)
             {
-                return false;
+                return;
             }
             if (data.Term < CurrentTerm)
             {
-                return false;
+                return;
             }
 
             if (data.Term > CurrentTerm)
@@ -141,7 +143,12 @@ namespace RaftLibrary
             CommitIndex = data.LeaderCommitIndex;
             Log.Add(data);
 
-            return true;
+            await OtherNodes[data.SentFrom].RespondAppendEntries(new ResponseEntriesData());
+        }
+
+        public async Task RespondAppendEntries(ResponseEntriesData data)
+        {
+
         }
 
         public async Task<bool> RequestVote(int term, int candidateId)
@@ -170,7 +177,7 @@ namespace RaftLibrary
 
             foreach (INode follower in OtherNodes)
             {
-                await follower.AppendEntries(rpcData);
+                await follower.RequestAppendEntries(rpcData);
             }
         }
 

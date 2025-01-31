@@ -45,7 +45,7 @@ public class LogTests
         INode node1 = Substitute.For<INode>();
         leader.OtherNodes = [node1];
         RPCData data = new() { SentFrom = 2, Entry = "New log", Term = 1 };
-        await leader.AppendEntries(data);
+        await leader.RequestAppendEntries(data);
         leader.Log.Should().NotBeNull();
     }
 
@@ -146,7 +146,7 @@ public class LogTests
         leader.OtherNodes = [node1, node2];
 
         RPCData data = new() { SentFrom = 2, Entry = "New log", Term = 1, LeaderCommitIndex = leader.CommitIndex };
-        await node1.AppendEntries(data);
+        await node1.RequestAppendEntries(data);
 
     }
 
@@ -158,7 +158,7 @@ public class LogTests
         follower.CommitIndex.Should().Be(0);
 
         RPCData data = new() { SentFrom = 2, Entry = "New log", Term = 1, LeaderCommitIndex = 4 };
-        await follower.AppendEntries(data);
+        await follower.RequestAppendEntries(data);
 
         follower.CommitIndex.Should().Be(4);
     }
@@ -186,13 +186,13 @@ public class LogTests
 
         leader.CommitIndex.Should().Be(0);
         RPCData data = new() { SentFrom = 2, Entry = "New log", Term = 1, LeaderCommitIndex = leader.CommitIndex };
-        node1.AppendEntries(data).Returns(true);
-        node2.AppendEntries(data).Returns(true);
-        node3.AppendEntries(data).Returns(true);
-        node4.AppendEntries(data).Returns(false);
+        node1.RequestAppendEntries(data).Returns(true);
+        node2.RequestAppendEntries(data).Returns(true);
+        node3.RequestAppendEntries(data).Returns(true);
+        node4.RequestAppendEntries(data).Returns(false);
         foreach (INode node in leader.OtherNodes)
         {
-            await node.AppendEntries(data);
+            await node.RequestAppendEntries(data);
         }
         //need some way of "counting" the votes
         leader.CommitIndex.Should().Be(1);
