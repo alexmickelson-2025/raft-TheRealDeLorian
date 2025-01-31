@@ -12,7 +12,7 @@ public class StateMachine
     Z = z;
   }
 
-  public async Task<string> GetState()
+  public string GetState()
   {
     return $"X={X}, Y={Y}, Z={Z}";
   }
