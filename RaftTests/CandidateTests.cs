@@ -24,7 +24,7 @@ public class CandidateTests
     {
         Node node = new([], 1);
         node.CurrentTerm = 2;
-        bool response = await node.AppendEntries(new RPCData { SentFrom = 2, Term = 1 });
+        bool response = await node.RequestAppendEntries(new RPCData { SentFrom = 2, Term = 1 });
         response.Should().Be(false);
     }
 
@@ -100,7 +100,7 @@ public class CandidateTests
         await node.Timeout();
         node.State.Should().Be(NodeState.Candidate);
 
-        await node.AppendEntries(new RPCData { SentFrom = 2, Term = 5 });
+        await node.RequestAppendEntries(new RPCData { SentFrom = 2, Term = 5 });
         node.State.Should().Be(NodeState.Follower);
     }
 
