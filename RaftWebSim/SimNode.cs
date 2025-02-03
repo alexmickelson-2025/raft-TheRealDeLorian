@@ -12,25 +12,10 @@ namespace RaftWebSim
         }
 
         public bool SimulationRunning { get; private set; } = false;
-        public int CurrentTerm { get => ((INode)InnerNode).CurrentTerm; set => ((INode)InnerNode).CurrentTerm = value; }
-        public int HeartbeatsReceived { get => ((INode)InnerNode).HeartbeatsReceived; set => ((INode)InnerNode).HeartbeatsReceived = value; }
         public int Id { get => ((INode)InnerNode).Id; set => ((INode)InnerNode).Id = value; }
-        public int LeaderId { get => ((INode)InnerNode).LeaderId; set => ((INode)InnerNode).LeaderId = value; }
-        public INode[] OtherNodes { get => ((INode)InnerNode).OtherNodes; set => ((INode)InnerNode).OtherNodes = value; }
-        public NodeState State { get => ((INode)InnerNode).State; set => ((INode)InnerNode).State = value; }
-        public int TimeLeft { get => ((INode)InnerNode).TimeLeft; set => ((INode)InnerNode).TimeLeft = value; }
-        public int? VotedFor { get => ((INode)InnerNode).VotedFor; set => ((INode)InnerNode).VotedFor = value; }
         public static int NetworkRequestDelay { get; set; } = 1000;
-        public List<RPCData> Log { get => ((INode)InnerNode).Log; set => ((INode)InnerNode).Log = value; }
-        public int NextIndex { get => ((INode)InnerNode).NextIndex; set => ((INode)InnerNode).NextIndex = value; }
-        public List<(int nodeId, int nextIndex)> NextIndicesToSend { get => ((INode)InnerNode).NextIndicesToSend; set => ((INode)InnerNode).NextIndicesToSend = value; }
-        public int CommitIndex { get => ((INode)InnerNode).CommitIndex; set => ((INode)InnerNode).CommitIndex = value; }
-        public StateMachine StateMachine { get => ((INode)InnerNode).StateMachine; set => ((INode)InnerNode).StateMachine = value; }
 
-        public Task<bool> RequestAppendEntries(RPCData data)
-        {
-            return ((INode)InnerNode).RequestAppendEntries(data);
-        }
+       
 
         public Task<bool> RequestVote(int term, int candidateId)
         {
@@ -54,6 +39,14 @@ namespace RaftWebSim
             await InnerNode.SendCommand(data);
         }
 
+        public Task RequestAppendEntries(RPCData data)
+        {
+            return ((INode)InnerNode).RequestAppendEntries(data);
+        }
 
+        public Task RespondAppendEntries(ResponseEntriesData data)
+        {
+            return ((INode)InnerNode).RespondAppendEntries(data);
+        }
     }
 }

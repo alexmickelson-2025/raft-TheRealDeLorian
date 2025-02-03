@@ -1,0 +1,14 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using System.Collections.Concurrent
+
+<div>
+  @foreach (var url in urls)
+  {
+    <div>@url</div>
+  }
+</div>
+
+@code {
+  string[] urls = Environment.GetEnvironmentVariable("NODE_URLS").Split(',');
+ }
