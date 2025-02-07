@@ -66,6 +66,7 @@
     async void sendEntry()
     {
         await NodeDataService.SendEntryToApi1(new RequestAppendEntriesData() { Entry="What's up?"});
+        nodeData1 = await NodeDataService.GetDataFromApi1();
 
     }
 
