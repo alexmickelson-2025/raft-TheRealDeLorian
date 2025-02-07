@@ -11,12 +11,40 @@
 @*     } *@
 @* </div> *@
 
-<div>
-    <div>The data for node 1 is @nodeData1</div>
-    <div>The data for node 2 is @nodeData2</div>
-    <div>The data for node 3 is @nodeData3</div>
-</div>
+<button @onclick="sendEntry">Send entry</button>
 
+
+@if(nodeData1 is not null && nodeData2 is not null && nodeData3 is not null)
+{
+
+    <div>
+        <div>The logs for node 1 are 
+            @foreach (RequestAppendEntriesData log in nodeData1.Log)
+            {
+                <div>@log.Entry</div>
+            }
+        </div>
+        <div>The logs for node 2 are 
+            @foreach (RequestAppendEntriesData log in nodeData2.Log)
+            {
+                <div>@log.Entry</div>
+            }
+        </div>
+        <div>The logs for node 3 are 
+            @foreach (RequestAppendEntriesData log in nodeData3.Log)
+            {
+                <div>@log.Entry</div>
+            }
+        </div>
+    </div>
+
+    <div>
+        <div>The state for node 1 is @nodeData1.StateMachineState</div> 
+        <div>The state for node 2 is @nodeData2.StateMachineState</div>
+        <div>The state for node 3 is @nodeData3.StateMachineState</div>
+    </div>
+
+}
 
 
 
@@ -33,6 +61,12 @@
         nodeData1 = await NodeDataService.GetDataFromApi1();
         nodeData2 = await NodeDataService.GetDataFromApi2();
         nodeData3 = await NodeDataService.GetDataFromApi3();
+    }
+
+    async void sendEntry()
+    {
+        await NodeDataService.SendEntryToApi1(new RequestAppendEntriesData() { Entry="What's up?"});
+
     }
 
    

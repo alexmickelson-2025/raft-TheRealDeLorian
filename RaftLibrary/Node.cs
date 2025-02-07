@@ -51,7 +51,7 @@ namespace RaftLibrary
 
         private async void OnTimerRunout(Object source, ElapsedEventArgs e)
         {
-            Console.WriteLine("The election timer has run out");
+            //Console.WriteLine("The election timer has run out");
             await Timeout();
             ResetTimer();
         }
@@ -75,7 +75,7 @@ namespace RaftLibrary
         private void IncrementTerm()
         {
             CurrentTerm++;
-            Console.WriteLine("Term for node " + Id + " is now " + CurrentTerm);
+            //Console.WriteLine("Term for node " + Id + " is now " + CurrentTerm);
         }
 
         public async Task StartHeartbeatTimer()
@@ -126,34 +126,35 @@ namespace RaftLibrary
 
         public async Task RequestAppendEntries(RequestAppendEntriesData data)
         {
-            if (IsPaused)
-            {
-                return;
-            }
-            if (data.Term < CurrentTerm)
-            {
-                return;
-            }
+            //if (IsPaused)
+            //{
+            //    return;
+            //}
+            //if (data.Term < CurrentTerm)
+            //{
+            //    return;
+            //}
 
-            if (data.Term > CurrentTerm)
-            {
-                CurrentTerm = data.Term;
-                State = NodeState.Follower;
-            }
+            //if (data.Term > CurrentTerm)
+            //{
+            //    CurrentTerm = data.Term;
+            //    State = NodeState.Follower;
+            //}
 
-            if (data.Entry == null || data.Entry == "")
-            {
-                LeaderId = data.SentFrom;
-                HeartbeatsReceived++;
-            }
+            //if (data.Entry == null || data.Entry == "")
+            //{
+            //    LeaderId = data.SentFrom;
+            //    HeartbeatsReceived++;
+            //}
 
-            CommitIndex = data.LeaderCommitIndex;
+            //CommitIndex = data.LeaderCommitIndex;
+            Console.WriteLine("Received append entries from " + data.SentFrom);
             Log.Add(data);
 
-            if (OtherNodes.ContainsKey(data.SentFrom) && OtherNodes.Count > 0)
-            {
-                await OtherNodes[data.SentFrom].RespondAppendEntries(new ResponseEntriesData());
-            }
+            //if (OtherNodes.ContainsKey(data.SentFrom) && OtherNodes.Count > 0)
+            //{
+            //    await OtherNodes[data.SentFrom].RespondAppendEntries(new ResponseEntriesData());
+            //}
         }
 
         public async Task RespondAppendEntries(ResponseEntriesData data)
