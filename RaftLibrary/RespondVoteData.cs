@@ -2,7 +2,7 @@
 
 namespace RaftLibrary;
 
-public record VoteResponseData
+public record RespondVoteData
 {
     public int Term { get; set; }
     public bool Success { get; set; }

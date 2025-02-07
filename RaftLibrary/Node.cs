@@ -11,7 +11,7 @@ namespace RaftLibrary
         public int LeaderId { get; set; }
         public NodeState State { get; set; }
         public StateMachine StateMachine { get; set; } = new();
-        public INode[] OtherNodes { get; set; }
+        public Dictionary<int, INode> OtherNodes { get; set; } = new();
 
         //Election
         public int CurrentTerm { get; set; } = 1;
@@ -21,7 +21,7 @@ namespace RaftLibrary
         Random r = new();
 
         //Logging
-        public List<RPCData> Log { get; set; } = new();
+        public List<RequestAppendEntriesData> Log { get; set; } = new();
         public int CommitIndex { get; set; }
         public int HeartbeatsReceived { get; set; }
         public static int NodeIntervalScalar { get; set; }
@@ -31,10 +31,9 @@ namespace RaftLibrary
         System.Timers.Timer HeartbeatTimer;
 
 
-        public Node(Node[] otherNodes, int nodeId)
+        public Node(int nodeId)
         {
             Id = nodeId;
-            OtherNodes = otherNodes;
             // Start(); //Make this like timer.Start() where you have to start up the node first every time you make it. or come up with some other way to make the timer not start int the ctor
         }
 
@@ -48,6 +47,15 @@ namespace RaftLibrary
             ElectionTimer.Enabled = true;
         }
 
+      
+
+        private async void OnTimerRunout(Object source, ElapsedEventArgs e)
+        {
+            Console.WriteLine("The election timer has run out");
+            await Timeout();
+            ResetTimer();
+        }
+
         private void ResetTimer()
         {
             TimeLeft = r.Next(150, 301);
@@ -55,20 +63,19 @@ namespace RaftLibrary
             ElectionTimer.Start();
         }
 
-        private async void OnTimerRunout(Object source, ElapsedEventArgs e)
-        {
-            await Timeout();
-            ResetTimer();
-        }
-
 
         public async Task Timeout()
         {
-            Console.WriteLine("election...");
-            CurrentTerm++;
+            IncrementTerm();
             State = NodeState.Candidate;
             VotedFor = Id;
             await ConductElection();
+        }
+
+        private void IncrementTerm()
+        {
+            CurrentTerm++;
+            Console.WriteLine("Term for node " + Id + " is now " + CurrentTerm);
         }
 
         public async Task StartHeartbeatTimer()
@@ -82,26 +89,26 @@ namespace RaftLibrary
         private async void OnHeartbeatTimerRunout(object? sender, ElapsedEventArgs e)
         {
             Console.WriteLine("heartbeat...");
-            RPCData rpcData = new RPCData() { SentFrom = Id, Term = CurrentTerm, LeaderCommitIndex = CommitIndex };
-            await RequestAppendEntries(rpcData);
+            RequestAppendEntriesData requestAppendEntriesData = new RequestAppendEntriesData() { SentFrom = Id, Term = CurrentTerm, LeaderCommitIndex = CommitIndex };
+            await RequestAppendEntries(requestAppendEntriesData);
         }
 
         private async Task ConductElection()
         {
-            if (OtherNodes.Length == 0)
+            if (OtherNodes.Count == 0)
             {
                 await WinElection();
             }
             List<INode> supporters = new();
-            foreach (INode otherNode in OtherNodes)
+            foreach (var otherNode in OtherNodes.Values)
             {
-                bool isSupporter = await otherNode.RequestVote(CurrentTerm, Id);
-                if (isSupporter)
-                {
-                    supporters.Add(otherNode);
-                }
+                await otherNode.RequestVote(new RequestVoteData() { CandidateId=Id, Term=CurrentTerm }); //requestvote is sent, which then returns 
+                //if (isSupporter)
+                //{
+                //    supporters.Add(otherNode);
+                //}
             }
-            if (supporters.Count > OtherNodes.Length * 0.5)
+            if (supporters.Count > OtherNodes.Count * 0.5)
             {
                 await WinElection();
             }
@@ -110,14 +117,14 @@ namespace RaftLibrary
         public async Task WinElection()
         {
             State = NodeState.Leader;
-            foreach (INode otherNode in OtherNodes)
+            foreach (INode otherNode in OtherNodes.Values)
             {
-                await otherNode.RequestAppendEntries(new RPCData { SentFrom = Id, Term = CurrentTerm });
+                await otherNode.RequestAppendEntries(new RequestAppendEntriesData { SentFrom = Id, Term = CurrentTerm });
                 // otherNode.NextIndex = Log.Count + 1;
             }
         }
 
-        public async Task RequestAppendEntries(RPCData data)
+        public async Task RequestAppendEntries(RequestAppendEntriesData data)
         {
             if (IsPaused)
             {
@@ -143,7 +150,10 @@ namespace RaftLibrary
             CommitIndex = data.LeaderCommitIndex;
             Log.Add(data);
 
-            await OtherNodes[data.SentFrom].RespondAppendEntries(new ResponseEntriesData());
+            if (OtherNodes.ContainsKey(data.SentFrom) && OtherNodes.Count > 0)
+            {
+                await OtherNodes[data.SentFrom].RespondAppendEntries(new ResponseEntriesData());
+            }
         }
 
         public async Task RespondAppendEntries(ResponseEntriesData data)
@@ -151,33 +161,33 @@ namespace RaftLibrary
 
         }
 
-        public async Task<bool> RequestVote(int term, int candidateId)
+        public async Task RequestVote(RequestVoteData data)
         {
-            if (term < CurrentTerm)
+            if (data.Term < CurrentTerm)
             {
-                return false;
+                //return false; //send a response that says no
             }
-            else if (term > CurrentTerm)
+            else if (data.Term > CurrentTerm)
             {
-                CurrentTerm = term;
+                CurrentTerm = data.Term;
                 VotedFor = null;
             }
             if (VotedFor is not null)
             {
-                return false;
+                //return false; respond no
             }
-            VotedFor = candidateId;
-            return true;
+            VotedFor = data.CandidateId;
+            //return true; //respond yes
         }
 
         public async Task RequestFromClient(string command)
         {
-            var rpcData = new RPCData() { Entry = command, SentFrom = Id, Term = CurrentTerm };
-            Log.Add(rpcData);
+            var requestAppendEntriesData = new RequestAppendEntriesData() { Entry = command, SentFrom = Id, Term = CurrentTerm };
+            Log.Add(requestAppendEntriesData);
 
-            foreach (INode follower in OtherNodes)
+            foreach (INode follower in OtherNodes.Values)
             {
-                await follower.RequestAppendEntries(rpcData);
+                await follower.RequestAppendEntries(requestAppendEntriesData);
             }
         }
 
@@ -217,6 +227,21 @@ namespace RaftLibrary
                     return false;
             }
             return true;
+        }
+
+        public void AddOtherNodes(List<INode> nodes)
+        {
+            foreach (INode node in nodes)
+            {
+                OtherNodes.Add(node.Id, node);
+            }
+        }
+
+       
+
+        public Task RespondVote(RespondVoteData data)
+        {
+            throw new NotImplementedException();
         }
     }
 }

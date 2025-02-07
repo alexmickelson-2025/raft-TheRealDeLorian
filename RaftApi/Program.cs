@@ -25,7 +25,7 @@ INode[] otherNodes = otherNodesRaw
 logger.LogInformation("other nodes {nodes}", JsonSerializer.Serialize(otherNodes));
 
 
-var node = new Node([], int.Parse(nodeId))
+var node = new Node(int.Parse(nodeId))
 {
 
 };
@@ -51,7 +51,7 @@ app.MapGet("/nodeData", () =>
   );
 });
 
-app.MapPost("/request/appendEntries", async (RPCData request) =>
+app.MapPost("/request/appendEntries", async (RequestAppendEntriesData request) =>
 {
   logger.LogInformation("received append entries request {request}", request);
   await node.RequestAppendEntries(request);

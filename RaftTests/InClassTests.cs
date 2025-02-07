@@ -14,10 +14,10 @@ public class InClassTests
     [Fact]
     public async Task GivenNodeIsLeaderWithElectionLoopWhenTheyGetPausedOtherNodesDontGetHeartbeat400ms()
     {
-        Node leader = new Node([], 1);
+        Node leader = new Node(1);
         leader.State = NodeState.Leader;
         INode node1 = Substitute.For<INode>();
-        leader.OtherNodes = [node1];
+        leader.OtherNodes.Add(node1.Id, node1);
         leader.Start();
 
         int nodeHeartbeatsBeforePause = node1.HeartbeatsReceived;
@@ -30,10 +30,10 @@ public class InClassTests
     [Fact]
     public async Task GivenNodeIsLeaderWithElectionLoopWhenPauseGetsNoHeartbeatsThenResume()
     {
-        Node leader = new Node([], 1);
+        Node leader = new Node(1);
         leader.State = NodeState.Leader;
         INode node1 = Substitute.For<INode>();
-        leader.OtherNodes = [node1];
+        leader.OtherNodes.Add(node1.Id, node1);
         int nodeHeartbeatsBeforePause = node1.HeartbeatsReceived;
 
         leader.Start(); //TODO: I don't think the start is working the way I think it does
