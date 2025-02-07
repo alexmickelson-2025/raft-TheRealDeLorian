@@ -4,10 +4,16 @@
 @using RaftLibrary
 @inject NodeDataService NodeDataService
 
+@* <div> *@
+@*     @foreach (var url in urls) *@
+@*     { *@
+@*         <div>@url</div> *@
+@*     } *@
+@* </div> *@
+
 <div>
     @foreach (var url in urls)
     {
-        <div>@url</div>
         <div>The data for node @url is @nodeDatas</div>
     }
 </div>

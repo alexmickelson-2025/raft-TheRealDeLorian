@@ -32,7 +32,7 @@ var node = new Node(int.Parse(nodeId))
 
 Node.NodeIntervalScalar = int.Parse(nodeIntervalScalarRaw);
 
-node.Start();
+node.Start(); //this is what gets the node going. If data isnt being updated it's because the Node class isn't configured to update it. 
 
 app.MapGet("/health", () => "healthy");
 

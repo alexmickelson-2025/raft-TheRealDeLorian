@@ -1,6 +1,6 @@
 using RaftLibrary;
 
-public class HttpRpcOtherNode : INode
+public class HttpRpcOtherNode : INode //this class is acting as another node to make it easier for me to make a node communicate with the others.
 {
   public int Id { get; }
   public string Url { get; }
