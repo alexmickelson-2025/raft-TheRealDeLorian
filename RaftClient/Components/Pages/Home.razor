@@ -59,8 +59,8 @@
     protected override async Task OnInitializedAsync()
     {
         nodeData1 = await NodeDataService.GetDataFromApi1();
-        @* nodeData2 = await NodeDataService.GetDataFromApi2(); *@
-        @* nodeData3 = await NodeDataService.GetDataFromApi3(); *@
+        nodeData2 = await NodeDataService.GetDataFromApi2();
+        nodeData3 = await NodeDataService.GetDataFromApi3();
     }
 
     async void sendEntry()

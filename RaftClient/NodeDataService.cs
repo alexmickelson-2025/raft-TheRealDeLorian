@@ -10,7 +10,7 @@ namespace RaftClient
         public NodeDataService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            this.urls = Environment.GetEnvironmentVariable("NODE_URLS").Split(',');
+            urls = Environment.GetEnvironmentVariable("NODE_URLS").Split(',');
         }
 
         public async Task<NodeData> GetDataFromApi1()

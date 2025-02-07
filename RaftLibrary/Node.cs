@@ -51,7 +51,7 @@ namespace RaftLibrary
 
         private async void OnTimerRunout(Object source, ElapsedEventArgs e)
         {
-            Console.WriteLine("The election timer has run out");
+            // Console.WriteLine("The election timer has run out");
             await Timeout();
             ResetTimer();
         }
@@ -75,7 +75,7 @@ namespace RaftLibrary
         private void IncrementTerm()
         {
             CurrentTerm++;
-            Console.WriteLine("Term for node " + Id + " is now " + CurrentTerm);
+            // Console.WriteLine("Term for node " + Id + " is now " + CurrentTerm);
         }
 
         public async Task StartHeartbeatTimer()
