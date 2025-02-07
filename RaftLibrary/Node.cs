@@ -150,6 +150,7 @@ namespace RaftLibrary
             //CommitIndex = data.LeaderCommitIndex;
             Console.WriteLine("Received append entries from " + data.SentFrom);
             Log.Add(data);
+            Console.WriteLine("Log length is " + Log.Count);
 
             //if (OtherNodes.ContainsKey(data.SentFrom) && OtherNodes.Count > 0)
             //{
