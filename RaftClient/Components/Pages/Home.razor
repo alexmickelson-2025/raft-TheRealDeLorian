@@ -12,10 +12,9 @@
 @* </div> *@
 
 <div>
-    @foreach (var url in urls)
-    {
-        <div>The data for node @url is @nodeDatas</div>
-    }
+    <div>The data for node 1 is @nodeData1</div>
+    <div>The data for node 2 is @nodeData2</div>
+    <div>The data for node 3 is @nodeData3</div>
 </div>
 
 
@@ -24,12 +23,19 @@
 @code {
     string[] urls = Environment.GetEnvironmentVariable("NODE_URLS").Split(',');
 
-    NodeData nodeDatas;
+    NodeData nodeData1;
+    NodeData nodeData2;
+    NodeData nodeData3;
+
 
     protected override async Task OnInitializedAsync()
     {
-        nodeDatas = await NodeDataService.GetDataFromApi1();
+        nodeData1 = await NodeDataService.GetDataFromApi1();
+        nodeData2 = await NodeDataService.GetDataFromApi2();
+        nodeData3 = await NodeDataService.GetDataFromApi3();
     }
+
+   
 
 
 
