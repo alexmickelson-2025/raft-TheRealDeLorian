@@ -15,6 +15,7 @@ namespace RaftClient
 
         public async Task<NodeData> GetDataFromApi1()
         {
+            Console.WriteLine("url" + urls[0]);
             return await _httpClient.GetFromJsonAsync<NodeData>(urls[0] + "/nodeData");
         }
 
