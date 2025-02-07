@@ -1,6 +1,6 @@
 namespace RaftLibrary
 {
-  public class NodeData
+  public record NodeData
   {
     public int Id { get; set; }
     public NodeState State { get; set; }
@@ -10,17 +10,5 @@ namespace RaftLibrary
     public int CommittedEntryIndex { get; set; }
     public List<RequestAppendEntriesData> Log { get; set; }
     public string StateMachineState { get; set; }
-
-    public NodeData(int id, int electionTimeout, string stateMachineState, int term, int currentTermLeader, int committedEntryIndex, List<RequestAppendEntriesData> log, NodeState state, int nodeIntervalScalar)
-    {
-      Id = id;
-      State = state;
-      ElectionTimeout = electionTimeout;
-      Term = term;
-      CurrentTermLeader = currentTermLeader;
-      CommittedEntryIndex = committedEntryIndex;
-      Log = log;
-      StateMachineState = stateMachineState;
-    }
   }
 }

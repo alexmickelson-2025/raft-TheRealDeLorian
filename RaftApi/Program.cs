@@ -38,17 +38,17 @@ app.MapGet("/health", () => "healthy");
 
 app.MapGet("/nodeData", () =>
 {
-  return new NodeData(
-    id: node.Id,
-    state: node.State,
-    electionTimeout: node.TimeLeft,
-    term: node.CurrentTerm,
-    currentTermLeader: node.LeaderId,
-    committedEntryIndex: node.CommitIndex,
-    log: node.Log,
-    stateMachineState: node.StateMachine.GetState(),
-    nodeIntervalScalar: Node.NodeIntervalScalar
-  );
+    return new NodeData()
+  {
+    Id = node.Id,
+    State = node.State,
+    ElectionTimeout = node.TimeLeft,
+    Term = node.CurrentTerm,
+    CurrentTermLeader = node.LeaderId,
+    CommittedEntryIndex = node.CommitIndex,
+    Log = node.Log,
+    StateMachineState = node.StateMachine.GetState()
+  };
 });
 
 app.MapPost("/request/appendEntries", async (RequestAppendEntriesData request) =>
@@ -57,11 +57,11 @@ app.MapPost("/request/appendEntries", async (RequestAppendEntriesData request) =
   await node.RequestAppendEntries(request);
 });
 
-// app.MapPost("/request/vote", async (VoteRequestData request) =>
-// {
-//   logger.LogInformation("received vote request {request}", request);
-//   await node.RequestVote(request);
-// });
+app.MapPost("/request/vote", async (RequestVoteData request) =>
+{
+    logger.LogInformation("received vote request {request}", request);
+    await node.RequestVote(request);
+});
 
 app.MapPost("/response/appendEntries", async (ResponseEntriesData response) =>
 {
@@ -69,11 +69,11 @@ app.MapPost("/response/appendEntries", async (ResponseEntriesData response) =>
   await node.RespondAppendEntries(response);
 });
 
-// app.MapPost("/response/vote", async (VoteResponseData response) =>
-// {
-//   logger.LogInformation("received vote response {response}", response);
-//   await node.ResponseVote(response);
-// });
+app.MapPost("/response/vote", async (RespondVoteData response) =>
+{
+    logger.LogInformation("received vote response {response}", response);
+    await node.RespondVote(response);
+});
 
 app.MapPost("/request/command", async (ClientCommandData data) =>
 {

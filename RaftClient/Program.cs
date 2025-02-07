@@ -1,3 +1,4 @@
+using RaftClient;
 using RaftClient.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +6,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddHttpClient("API", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"] ?? "https://localhost:7180");
+});
+
+builder.Services.AddSingleton<NodeDataService>();
+
 
 
 var app = builder.Build();
