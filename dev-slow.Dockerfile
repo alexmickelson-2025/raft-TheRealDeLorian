@@ -8,4 +8,4 @@ WORKDIR /app
 
 COPY . /app
 
-CMD dotnet run --project RaftClient
+CMD dotnet run --project RaftApi
