@@ -68,4 +68,4 @@ services:
       - ./:/app
     command: dotnet watch --project RaftClient
     ports:
-    - 5000:8080
+    - 5069:8080
