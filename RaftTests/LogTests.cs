@@ -11,7 +11,7 @@ public class LogTests
     public async Task HeartbeatTimerWorks()
     {
         Node leader = new Node(1);
-        leader.State = NodeState.Leader;
+        leader.Status = NodeStatus.Leader;
         INode node1 = Substitute.For<INode>();
         leader.OtherNodes.Add(node1.Id, node1);
 
@@ -22,9 +22,9 @@ public class LogTests
     public async Task LeaderSendsHeartbeatEvery50ms()
     {
         Node leader = new Node(1);
-        leader.State = NodeState.Leader;
+        leader.Status = NodeStatus.Leader;
         INode node1 = Substitute.For<INode>();
-        leader.OtherNodes.Add(node1.Id, node1);    
+        leader.OtherNodes.Add(node1.Id, node1);
 
         int heartbeatsReceivedBeforeStart = node1.HeartbeatsReceived;
         leader.StartHeartbeatTimer();
@@ -37,14 +37,14 @@ public class LogTests
     }
 
 
-  
+
 
     // Testing #1
     [Fact]
     public async Task WhenLeaderReceivesClientCommandSendsLogEntryInNextAppendEntriesToAllNodes()
     {
         Node leader = new Node(1);
-        leader.State = NodeState.Leader;
+        leader.Status = NodeStatus.Leader;
         INode node1 = Substitute.For<INode>();
         node1.CurrentTerm = 1;
         node1.Log = new();
@@ -65,7 +65,7 @@ public class LogTests
     public async Task WhenLeaderReceivesClientCommandItIsAppendedToLeadersLogs()
     {
         Node leader = new Node(1);
-        leader.State = NodeState.Leader;
+        leader.Status = NodeStatus.Leader;
 
         await leader.RequestFromClient("Add 2");
 
@@ -97,7 +97,7 @@ public class LogTests
         leader.OtherNodes = new Dictionary<int, INode> { { node1.Id, node1 }, { node2.Id, node2 } };
 
         await leader.WinElection();
-        leader.State.Should().Be(NodeState.Leader);
+        leader.Status.Should().Be(NodeStatus.Leader);
 
         node1.NextIndex.Should().Be(leader.Log.Count + 1);
         node2.NextIndex.Should().Be(leader.Log.Count + 1);
@@ -108,7 +108,7 @@ public class LogTests
     public async Task LeadersMaintainNextIndexToSendForEachFollower()
     {
         Node leader = new Node(1);
-        leader.State = NodeState.Leader;
+        leader.Status = NodeStatus.Leader;
 
         INode node1 = Substitute.For<INode>();
         node1.CurrentTerm = 1;
@@ -121,7 +121,7 @@ public class LogTests
         leader.NextIndicesToSend = new List<(int nodeId, int nextIndex)>();
     }
 
-   
+
 
 
 

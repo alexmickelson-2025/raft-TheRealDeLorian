@@ -27,7 +27,7 @@ logger.LogInformation("other nodes {nodes}", JsonSerializer.Serialize(otherNodes
 
 var node = new Node(int.Parse(nodeId))
 {
-
+  OtherNodes = otherNodes
 };
 
 Node.NodeIntervalScalar = int.Parse(nodeIntervalScalarRaw);
@@ -38,10 +38,10 @@ app.MapGet("/health", () => "healthy");
 
 app.MapGet("/nodeData", () =>
 {
-    return new NodeData()
+  return new NodeData()
   {
     Id = node.Id,
-    State = node.State,
+    Status = node.Status,
     ElectionTimeout = (int)node.LastInterval - (int)node.ElectionStopwatch.ElapsedMilliseconds,
     Term = node.CurrentTerm,
     CurrentTermLeader = node.LeaderId,
@@ -59,8 +59,8 @@ app.MapPost("/request/appendEntries", async (RequestAppendEntriesData request) =
 
 app.MapPost("/request/vote", async (RequestVoteData request) =>
 {
-    logger.LogInformation("received vote request {request}", request);
-    await node.RequestVote(request);
+  logger.LogInformation("received vote request {request}", request);
+  await node.RequestVote(request);
 });
 
 app.MapPost("/response/appendEntries", async (ResponseEntriesData response) =>
@@ -71,8 +71,8 @@ app.MapPost("/response/appendEntries", async (ResponseEntriesData response) =>
 
 app.MapPost("/response/vote", async (RespondVoteData response) =>
 {
-    logger.LogInformation("received vote response {response}", response);
-    await node.RespondVote(response);
+  logger.LogInformation("received vote response {response}", response);
+  await node.RespondVote(response);
 });
 
 app.MapPost("/request/command", async (ClientCommandData data) =>

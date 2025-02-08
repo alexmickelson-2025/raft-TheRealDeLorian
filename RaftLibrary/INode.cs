@@ -11,6 +11,5 @@ namespace RaftLibrary
         Task RespondVote(RespondVoteData data);
         Task Start();
         Task Timeout();
-        void AddOtherNodes(List<INode> nodes);
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RaftLibrary;
 
-public enum NodeState
+public enum NodeStatus
 {
     Follower,
     Candidate,

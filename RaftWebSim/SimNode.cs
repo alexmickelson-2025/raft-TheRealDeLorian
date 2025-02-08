@@ -18,7 +18,7 @@ namespace RaftWebSim
         public int HeartbeatsReceived { get => ((INode)InnerNode).HeartbeatsReceived; set => ((INode)InnerNode).HeartbeatsReceived = value; }
         public int LeaderId { get => ((INode)InnerNode).LeaderId; set => ((INode)InnerNode).LeaderId = value; }
         public StateMachine StateMachine { get => ((INode)InnerNode).StateMachine; set => ((INode)InnerNode).StateMachine = value; }
-        public NodeState State { get => ((INode)InnerNode).State; set => ((INode)InnerNode).State = value; }
+        public NodeStatus State { get => ((INode)InnerNode).State; set => ((INode)InnerNode).State = value; }
         public int TimeLeft { get => ((INode)InnerNode).TimeLeft; set => ((INode)InnerNode).TimeLeft = value; }
         public int NextIndex { get => ((INode)InnerNode).NextIndex; set => ((INode)InnerNode).NextIndex = value; }
         public int CommitIndex { get => ((INode)InnerNode).CommitIndex; set => ((INode)InnerNode).CommitIndex = value; }

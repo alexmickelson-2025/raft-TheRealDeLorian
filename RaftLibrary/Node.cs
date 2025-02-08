@@ -9,9 +9,9 @@ namespace RaftLibrary
         //Node info
         public int Id { get; set; }
         public int LeaderId { get; set; }
-        public NodeState State { get; set; }
+        public NodeStatus Status { get; set; }
         public StateMachine StateMachine { get; set; } = new();
-        public Dictionary<int, INode> OtherNodes { get; set; } = new();
+        public INode[] OtherNodes { get; set; }
         public static int NodeIntervalScalar { get; set; } = 1;
 
 
@@ -78,7 +78,7 @@ namespace RaftLibrary
         {
             IncrementTerm();
             Console.WriteLine("the term is now " + CurrentTerm);
-            State = NodeState.Candidate;
+            Status = NodeStatus.Candidate;
             VotedFor = Id;
             await ConductElection();
         }
@@ -106,20 +106,21 @@ namespace RaftLibrary
 
         private async Task ConductElection()
         {
-            if (OtherNodes.Count == 0)
+            if (OtherNodes.Length == 0)
             {
                 await WinElection();
             }
+            
             List<INode> supporters = new();
-            foreach (var otherNode in OtherNodes.Values)
+            foreach (var otherNode in OtherNodes)
             {
-                await otherNode.RequestVote(new RequestVoteData() { CandidateId=Id, Term=CurrentTerm }); //requestvote is sent, which then returns 
+                await otherNode.RequestVote(new RequestVoteData() { CandidateId = Id, Term = CurrentTerm }); //requestvote is sent, which then returns 
                 //if (isSupporter)
                 //{
                 //    supporters.Add(otherNode);
                 //}
             }
-            if (supporters.Count > OtherNodes.Count * 0.5)
+            if (supporters.Count > OtherNodes.Length * 0.5)
             {
                 await WinElection();
             }
@@ -127,8 +128,8 @@ namespace RaftLibrary
 
         public async Task WinElection()
         {
-            State = NodeState.Leader;
-            foreach (INode otherNode in OtherNodes.Values)
+            Status = NodeStatus.Leader;
+            foreach (INode otherNode in OtherNodes)
             {
                 await otherNode.RequestAppendEntries(new RequestAppendEntriesData { SentFrom = Id, Term = CurrentTerm });
                 // otherNode.NextIndex = Log.Count + 1;
@@ -198,7 +199,7 @@ namespace RaftLibrary
             var requestAppendEntriesData = new RequestAppendEntriesData() { Entry = command, SentFrom = Id, Term = CurrentTerm };
             Log.Add(requestAppendEntriesData);
 
-            foreach (INode follower in OtherNodes.Values)
+            foreach (INode follower in OtherNodes)
             {
                 await follower.RequestAppendEntries(requestAppendEntriesData);
             }
@@ -221,7 +222,7 @@ namespace RaftLibrary
 
         public bool Set(string key, int value)
         {
-            if (State != NodeState.Leader)
+            if (Status != NodeStatus.Leader)
             {
                 return false;
             }
@@ -242,15 +243,9 @@ namespace RaftLibrary
             return true;
         }
 
-        public void AddOtherNodes(List<INode> nodes)
-        {
-            foreach (INode node in nodes)
-            {
-                OtherNodes.Add(node.Id, node);
-            }
-        }
-
        
+
+
 
         public Task RespondVote(RespondVoteData data)
         {

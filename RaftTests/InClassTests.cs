@@ -15,7 +15,7 @@ public class InClassTests
     public async Task GivenNodeIsLeaderWithElectionLoopWhenTheyGetPausedOtherNodesDontGetHeartbeat400ms()
     {
         Node leader = new Node(1);
-        leader.State = NodeState.Leader;
+        leader.Status = NodeStatus.Leader;
         INode node1 = Substitute.For<INode>();
         leader.OtherNodes.Add(node1.Id, node1);
         leader.Start();
@@ -31,7 +31,7 @@ public class InClassTests
     public async Task GivenNodeIsLeaderWithElectionLoopWhenPauseGetsNoHeartbeatsThenResume()
     {
         Node leader = new Node(1);
-        leader.State = NodeState.Leader;
+        leader.Status = NodeStatus.Leader;
         INode node1 = Substitute.For<INode>();
         leader.OtherNodes.Add(node1.Id, node1);
         int nodeHeartbeatsBeforePause = node1.HeartbeatsReceived;

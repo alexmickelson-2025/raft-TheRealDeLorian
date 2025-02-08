@@ -9,8 +9,8 @@ public class FollowerTests
     [Fact]
     public async Task NewNodesInClusterAreFollowersOnStartup()
     {
-       Node node = new Node(1);
-       node.State.Should().Be(NodeState.Follower);
+        Node node = new Node(1);
+        node.Status.Should().Be(NodeStatus.Follower);
     }
 
     [Theory]
@@ -39,8 +39,8 @@ public class FollowerTests
         node3.AddOtherNodes(new List<INode> { node, node2 });
 
         await node.Timeout();
-        NodeState state = node.State;
-        state.Should().Be(NodeState.Candidate);
+        NodeStatus state = node.Status;
+        state.Should().Be(NodeStatus.Candidate);
     }
 
     [Theory]
@@ -78,8 +78,8 @@ public class FollowerTests
     {
         Node node = new Node(1);
         await node.RequestAppendEntries(new RequestAppendEntriesData() { SentFrom = 2 });
-        NodeState state = node.State;
-        state.Should().Be(NodeState.Follower);
+        NodeStatus state = node.Status;
+        state.Should().Be(NodeStatus.Follower);
     }
 
     //Testing #4
@@ -91,8 +91,8 @@ public class FollowerTests
         node.OtherNodes.Add(node2.Id, node2);
         node.Start();
         Thread.Sleep(500);
-        NodeState state = node.State;
-        state.Should().Be(NodeState.Candidate);
+        NodeStatus state = node.Status;
+        state.Should().Be(NodeStatus.Candidate);
     }
 
     //Testing 5

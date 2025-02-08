@@ -62,7 +62,7 @@ public class CandidateTests
     {
         Node node = new(1);
         await node.Timeout();
-        node.State.Should().Be(NodeState.Leader);
+        node.Status.Should().Be(NodeStatus.Leader);
     }
 
     //Testing #8    
@@ -97,10 +97,10 @@ public class CandidateTests
         node2.CurrentTerm = 5;
 
         await node.Timeout();
-        node.State.Should().Be(NodeState.Candidate);
+        node.Status.Should().Be(NodeStatus.Candidate);
 
         await node.RequestAppendEntries(new RequestAppendEntriesData { SentFrom = 2, Term = 5 });
-        node.State.Should().Be(NodeState.Follower);
+        node.Status.Should().Be(NodeStatus.Follower);
     }
 
     //Testing #13

@@ -3,7 +3,7 @@ namespace RaftLibrary
   public record NodeData
   {
     public int Id { get; set; }
-    public NodeState State { get; set; }
+    public NodeStatus Status { get; set; }
     public int ElectionTimeout { get; set; }
     public int Term { get; set; }
     public int CurrentTermLeader { get; set; }
