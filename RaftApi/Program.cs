@@ -42,7 +42,7 @@ app.MapGet("/nodeData", () =>
   {
     Id = node.Id,
     State = node.State,
-    ElectionTimeout = (int)node.ElectionStopwatch.ElapsedMilliseconds,
+    ElectionTimeout = (int)node.LastInterval - (int)node.ElectionStopwatch.ElapsedMilliseconds,
     Term = node.CurrentTerm,
     CurrentTermLeader = node.LeaderId,
     CommittedEntryIndex = node.CommitIndex,

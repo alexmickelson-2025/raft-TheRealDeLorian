@@ -12,6 +12,8 @@ namespace RaftLibrary
         public NodeState State { get; set; }
         public StateMachine StateMachine { get; set; } = new();
         public Dictionary<int, INode> OtherNodes { get; set; } = new();
+        public static int NodeIntervalScalar { get; set; } = 1;
+
 
         //Election
         public int CurrentTerm { get; set; } = 1;
@@ -19,14 +21,13 @@ namespace RaftLibrary
         public int TimeLeft { get; set; }
         System.Timers.Timer ElectionTimer;
         public Stopwatch ElectionStopwatch;
-        double LastInterval;
+        public double LastInterval;
         Random r = new();
 
         //Logging
         public List<RequestAppendEntriesData> Log { get; set; } = new();
         public int CommitIndex { get; set; }
         public int HeartbeatsReceived { get; set; }
-        public static int NodeIntervalScalar { get; set; } = 1;
         public int NextIndex { get; set; } = 1;
         public List<(int nodeId, int nextIndex)> NextIndicesToSend { get; set; }
         public bool IsPaused { get; set; }
@@ -66,7 +67,7 @@ namespace RaftLibrary
 
         private void ResetTimer()
         {
-            LastInterval = r.Next(NodeIntervalScalar * 150, NodeIntervalScalar * 301);
+            LastInterval = r.Next(150, 301);
             ElectionTimer.Interval = LastInterval;
             ElectionTimer.Start();
             ElectionStopwatch.Restart();
