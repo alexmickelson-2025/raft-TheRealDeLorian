@@ -12,7 +12,7 @@ namespace RaftLibrary
         public NodeStatus Status { get; set; }
         public StateMachine StateMachine { get; set; } = new();
         public INode[] OtherNodes { get; set; }
-        public static int NodeIntervalScalar { get; set; } = 1;
+        public static int NodeIntervalScalar { get; set; }
 
 
         //Election
@@ -23,6 +23,7 @@ namespace RaftLibrary
         public Stopwatch ElectionStopwatch;
         public double LastInterval;
         Random r = new();
+        List<INode> supporters {get; set;}
 
         //Logging
         public List<RequestAppendEntriesData> Log { get; set; } = new();
@@ -56,7 +57,7 @@ namespace RaftLibrary
         {
             // Console.WriteLine("The election timer has run out");
             await Timeout();
-            ResetTimer();
+            ResetElectionTimer();
         }
 
         public void SetTimeLeft()
@@ -65,9 +66,9 @@ namespace RaftLibrary
             TimeLeft = (int)(LastInterval - elapsed);
         }
 
-        private void ResetTimer()
+        private void ResetElectionTimer()
         {
-            LastInterval = r.Next(150, 301);
+            LastInterval = r.Next(NodeIntervalScalar * 150, NodeIntervalScalar * 301);
             ElectionTimer.Interval = LastInterval;
             ElectionTimer.Start();
             ElectionStopwatch.Restart();
@@ -76,11 +77,15 @@ namespace RaftLibrary
 
         public async Task Timeout()
         {
-            IncrementTerm();
-            Console.WriteLine("the term is now " + CurrentTerm);
             Status = NodeStatus.Candidate;
+            IncrementTerm();
             VotedFor = Id;
-            await ConductElection();
+            ResetElectionTimer();
+            foreach (var otherNode in OtherNodes)
+            {
+                await otherNode.RequestVote(new RequestVoteData() { CandidateId = Id, Term = CurrentTerm }); //requestvote is sent, which then returns 
+                Console.WriteLine("Vote request sent to node number " + otherNode.Id);
+            }
         }
 
         private void IncrementTerm()
@@ -104,31 +109,10 @@ namespace RaftLibrary
             await RequestAppendEntries(requestAppendEntriesData);
         }
 
-        private async Task ConductElection()
-        {
-            if (OtherNodes.Length == 0)
-            {
-                await WinElection();
-            }
-            
-            List<INode> supporters = new();
-            foreach (var otherNode in OtherNodes)
-            {
-                await otherNode.RequestVote(new RequestVoteData() { CandidateId = Id, Term = CurrentTerm }); //requestvote is sent, which then returns 
-                //if (isSupporter)
-                //{
-                //    supporters.Add(otherNode);
-                //}
-            }
-            if (supporters.Count > OtherNodes.Length * 0.5)
-            {
-                await WinElection();
-            }
-        }
-
         public async Task WinElection()
         {
             Status = NodeStatus.Leader;
+            LeaderId = Id;
             foreach (INode otherNode in OtherNodes)
             {
                 await otherNode.RequestAppendEntries(new RequestAppendEntriesData { SentFrom = Id, Term = CurrentTerm });
@@ -138,20 +122,13 @@ namespace RaftLibrary
 
         public async Task RequestAppendEntries(RequestAppendEntriesData data)
         {
-            //if (IsPaused)
-            //{
-            //    return;
-            //}
-            //if (data.Term < CurrentTerm)
-            //{
-            //    return;
-            //}
+           
 
-            //if (data.Term > CurrentTerm)
-            //{
-            //    CurrentTerm = data.Term;
-            //    State = NodeState.Follower;
-            //}
+            if (data.Term > CurrentTerm)
+            {
+               CurrentTerm = data.Term;
+               Status = NodeStatus.Follower;
+            }
 
             //if (data.Entry == null || data.Entry == "")
             //{
@@ -177,21 +154,40 @@ namespace RaftLibrary
 
         public async Task RequestVote(RequestVoteData data)
         {
+            Console.WriteLine("Vote requested from node " + data.CandidateId);
             if (data.Term < CurrentTerm)
             {
-                //return false; //send a response that says no
+                await OtherNodes.FirstOrDefault(node => node.Id == data.CandidateId)?.RespondVote(new RespondVoteData() { SentFromNodeId = Id, Success = false, Term = CurrentTerm });
+                Console.WriteLine($"Node {Id} did not vote for node {data.CandidateId} because the node {Id} had a larger term");
             }
             else if (data.Term > CurrentTerm)
             {
                 CurrentTerm = data.Term;
                 VotedFor = null;
+                Console.WriteLine($"Node {Id} has set its VotedFor to null because node {data.CandidateId} has requested a vote from a larger term");
             }
             if (VotedFor is not null)
             {
-                //return false; respond no
+                await OtherNodes.FirstOrDefault(node => node.Id == data.CandidateId)?.RespondVote(new RespondVoteData() { SentFromNodeId = Id, Success = false, Term = CurrentTerm });
+                Console.WriteLine($"Node {Id} did not vote for node {data.CandidateId} because node {Id} has already voted");
             }
             VotedFor = data.CandidateId;
-            //return true; //respond yes
+                            await OtherNodes.FirstOrDefault(node => node.Id == data.CandidateId)?.RespondVote(new RespondVoteData() { SentFromNodeId = Id, Success = true, Term = CurrentTerm });
+
+        }
+
+        public Task RespondVote(RespondVoteData data)
+        {
+            if(data.Success)
+            {
+                supporters.Add(OtherNodes.Where(e => e.Id == data.SentFromNodeId-1).FirstOrDefault());
+                Console.WriteLine($"Node {Id} has {supporters.Count} supporters");
+            }
+            if (supporters.Count > (OtherNodes.Length + 1) / 2)
+            {
+              WinElection();
+            }
+            return Task.CompletedTask;
         }
 
         public async Task RequestFromClient(string command)
@@ -247,9 +243,6 @@ namespace RaftLibrary
 
 
 
-        public Task RespondVote(RespondVoteData data)
-        {
-            throw new NotImplementedException();
-        }
+      
     }
 }

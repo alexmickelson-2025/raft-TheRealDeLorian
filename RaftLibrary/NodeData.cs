@@ -10,5 +10,6 @@ namespace RaftLibrary
     public int CommittedEntryIndex { get; set; }
     public List<RequestAppendEntriesData> Log { get; set; }
     public string StateMachineState { get; set; }
+    public int NodeIntervalScalar {get; set;}
   }
 }

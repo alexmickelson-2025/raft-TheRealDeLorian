@@ -51,7 +51,7 @@ public class HttpRpcOtherNode : INode //this class is acting as another node to 
     }
   }
  
-  public async Task ResponseVote(RespondVoteData response)
+  public async Task RespondVote(RespondVoteData response)
   {
     try
     {
@@ -68,22 +68,12 @@ public class HttpRpcOtherNode : INode //this class is acting as another node to 
     await client.PostAsJsonAsync(Url + "/request/command", data);
   }
 
-    public Task<bool> RequestVote(int term, int candidateId)
-    {
-        throw new NotImplementedException();
-    }
-
     public Task Start()
     {
         throw new NotImplementedException();
     }
 
     public Task Timeout()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task RespondVote(RespondVoteData data)
     {
         throw new NotImplementedException();
     }

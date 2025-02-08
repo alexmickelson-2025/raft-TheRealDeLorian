@@ -47,7 +47,8 @@ app.MapGet("/nodeData", () =>
     CurrentTermLeader = node.LeaderId,
     CommittedEntryIndex = node.CommitIndex,
     Log = node.Log,
-    StateMachineState = node.StateMachine.GetState()
+    StateMachineState = node.StateMachine.GetState(),
+    NodeIntervalScalar = Node.NodeIntervalScalar
   };
 });
 
