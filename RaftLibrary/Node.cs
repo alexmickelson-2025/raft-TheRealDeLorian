@@ -18,13 +18,15 @@ namespace RaftLibrary
         public int? VotedFor { get; set; }
         public int TimeLeft { get; set; }
         System.Timers.Timer ElectionTimer;
+        public Stopwatch ElectionStopwatch;
+        double LastInterval;
         Random r = new();
 
         //Logging
         public List<RequestAppendEntriesData> Log { get; set; } = new();
         public int CommitIndex { get; set; }
         public int HeartbeatsReceived { get; set; }
-        public static int NodeIntervalScalar { get; set; }
+        public static int NodeIntervalScalar { get; set; } = 1;
         public int NextIndex { get; set; } = 1;
         public List<(int nodeId, int nextIndex)> NextIndicesToSend { get; set; }
         public bool IsPaused { get; set; }
@@ -45,9 +47,9 @@ namespace RaftLibrary
             ElectionTimer.Elapsed += OnTimerRunout;
             ElectionTimer.AutoReset = true;
             ElectionTimer.Enabled = true;
+            ElectionStopwatch = new Stopwatch();
+            ElectionStopwatch.Start();
         }
-
-      
 
         private async void OnTimerRunout(Object source, ElapsedEventArgs e)
         {
@@ -56,17 +58,25 @@ namespace RaftLibrary
             ResetTimer();
         }
 
+        public void SetTimeLeft()
+        {
+            double elapsed = ElectionStopwatch.ElapsedMilliseconds;
+            TimeLeft = (int)(LastInterval - elapsed);
+        }
+
         private void ResetTimer()
         {
-            TimeLeft = r.Next(150, 301);
-            ElectionTimer.Interval = TimeLeft;
+            LastInterval = r.Next(NodeIntervalScalar * 150, NodeIntervalScalar * 301);
+            ElectionTimer.Interval = LastInterval;
             ElectionTimer.Start();
+            ElectionStopwatch.Restart();
         }
 
 
         public async Task Timeout()
         {
             IncrementTerm();
+            Console.WriteLine("the term is now " + CurrentTerm);
             State = NodeState.Candidate;
             VotedFor = Id;
             await ConductElection();

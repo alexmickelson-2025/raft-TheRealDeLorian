@@ -19,7 +19,7 @@ else
 }
 
 <div class="row">
-  <div class="col">
+  @* <div class="col">
     <div>
       <label for="speed">
         Election timeout between @(FormatMilliSeconds(150 * RaftNode.NodeIntervalScalar)) and @(FormatMilliSeconds(300 *
@@ -38,7 +38,7 @@ else
           @bind:event="oninput" @bind=RaftSimulationNode.NetworkRequestDelay />
       </label>
     </div>
-  </div>
+  </div> *@
   
   <div class="col">
     <div class="border p-3 rounded-3">
