@@ -105,9 +105,9 @@ namespace RaftLibrary
 
         private async void OnHeartbeatTimerRunout(object? sender, ElapsedEventArgs e)
         {
-            if(Status == NodeStatus.Leader)
+            if (Status == NodeStatus.Leader)
             {
-               await SendHeartbeats();
+                await SendHeartbeats();
             }
             else
             {
@@ -164,7 +164,7 @@ namespace RaftLibrary
 
         public async Task RespondAppendEntries(ResponseEntriesData data)
         {
-            if(data.Success )
+            if (data.Success)
             {
                 // if(loggedppl > total/2)  
                 //apply the command
@@ -216,14 +216,23 @@ namespace RaftLibrary
             try
             {
                 Console.WriteLine($"Processing command: {data.Type}, Key: {data.Key}, Value: {data.Value}");
-                bool success = false;
                 if (Status == NodeStatus.Leader)
                 {
-                    LogEntry logEntry = new() {Command=data, Index=Log.Count + 1, Term=CurrentTerm};
+                    LogEntry logEntry = new() { Command = data, Index = Log.Count + 1, Term = CurrentTerm };
                     Log.Add(logEntry);
-                    var newEntries = new List<LogEntry>() {logEntry};
-                    await RequestAppendEntries(new RequestAppendEntriesData() {Entries=newEntries, LeaderCommitIndex=CommitIndex, LeaderId=Id, Term=CurrentTerm});
-                   
+                    var newEntries = new List<LogEntry>() { logEntry };
+
+                    RequestAppendEntriesData requestData = new()
+                    {
+                        Entries = newEntries,
+                        LeaderCommitIndex = CommitIndex,
+                        LeaderId = Id,
+                        Term = CurrentTerm,
+                        PrevLogIndex = Log.Count > 1 ? Log[^2].Index : 0,
+                        PrevLogTerm = Log.Count > 1 ? Log[^2].Term : 0
+                    };
+                    var tasks = OtherNodes.Select(node => node.RequestAppendEntries(requestData)).ToList();
+                    await Task.WhenAll(tasks);
                 }
                 else
                 {
