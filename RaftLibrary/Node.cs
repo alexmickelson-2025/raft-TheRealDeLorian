@@ -56,7 +56,6 @@ namespace RaftLibrary
 
         private async void OnTimerRunout(Object source, ElapsedEventArgs e)
         {
-            Console.WriteLine("The election timer has run out");
             await Timeout();
             ResetElectionTimer();
         }
@@ -92,7 +91,6 @@ namespace RaftLibrary
         private void IncrementTerm()
         {
             CurrentTerm++;
-            // Console.WriteLine("Term for node " + Id + " is now " + CurrentTerm);
         }
 
         public async Task StartHeartbeatTimer()
@@ -126,7 +124,6 @@ namespace RaftLibrary
         {
             foreach (INode otherNode in OtherNodes)
             {
-                System.Console.WriteLine("Sending heartbeat");
                 await otherNode.RequestAppendEntries(new RequestAppendEntriesData { LeaderId = Id, Term = CurrentTerm });
                 // otherNode.NextIndex = Log.Count + 1;
             }
@@ -146,7 +143,6 @@ namespace RaftLibrary
             HeartbeatsReceived++;
             Status = NodeStatus.Follower;
 
-            Console.WriteLine("Received append entries from " + data.LeaderId + ". Heartbeats received: " + HeartbeatsReceived);
             if (data.Entries != null)
             {
                 foreach (var entry in data.Entries)
@@ -154,7 +150,6 @@ namespace RaftLibrary
                     Log.Add(entry);
                 }
             }
-            Console.WriteLine("Log length is " + Log.Count);
 
             // if (OtherNodes.Length > 0)
             // {
