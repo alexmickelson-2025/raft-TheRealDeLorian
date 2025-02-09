@@ -16,44 +16,46 @@
 
 <button @onclick="sendEntry">Send entry</button>
 
+<div class="row">
+    @foreach (var nodeData in allNodeData)
+    {
+        <div class="col">
 
-@foreach (var nodeData in allNodeData)
-{
-    <div>
+            @if (nodeData is not null)
+            {
 
-        @if (nodeData is not null)
-        {
+                <h2>Node @nodeData.Id</h2>
+                <div>
+                    Role: @nodeData.Status
+                </div>
+                <div>
+                    Term: @nodeData.Term
+                </div>
+                <div>
+                    Node @nodeData.CurrentTermLeader is the leader
+                </div>
 
-            <h2>Node @nodeData.Id</h2>
-            <div>
-                @nodeData.Status
-            </div>
-            <div>
-                Term @nodeData.Term
-            </div>
-            <div>
-                Leader is Node @nodeData.CurrentTermLeader
-            </div>
+                var timeoutRemaining = nodeData.ElectionTimeout;
+                var maxIntervalMilliseconds = 300 * nodeData.NodeIntervalScalar;
+                var percentageRemaining = (int)(100 * (decimal)timeoutRemaining / (decimal)maxIntervalMilliseconds);
 
-            var timeoutRemaining = nodeData.ElectionTimeout;
-            var maxIntervalMilliseconds = 300 * nodeData.NodeIntervalScalar;
-            var percentageRemaining = (int)(100 * (decimal)timeoutRemaining / (decimal)maxIntervalMilliseconds);
-
-            @* <div>timeoutRemaining @timeoutRemaining</div>
+                @* <div>timeoutRemaining @timeoutRemaining</div>
             <div>timeoutRemaining / maxinterval @(100 * (decimal)timeoutRemaining / (decimal)maxIntervalMilliseconds)</div>
             <div>maxIntervalMilliseconds @maxIntervalMilliseconds</div>
             <div>percentage remaining @percentageRemaining</div>
             <div>Node Interval scalar: @nodeData.NodeIntervalScalar</div> *@
 
-            <div style="width: 100%; max-width: 300px;">
-                <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow=@(Math.Abs(timeoutRemaining))
-                    aria-valuemin="0" aria-valuemax="@(maxIntervalMilliseconds)">
-                    <div class="progress-bar bg-dark-subtle" style="width: @percentageRemaining%;"></div>
+                <div style="width: 100%; max-width: 300px;">
+                    <div class="progress" role="progressbar" aria-label="Basic example"
+                        aria-valuenow=@(Math.Abs(timeoutRemaining)) aria-valuemin="0"
+                        aria-valuemax="@(maxIntervalMilliseconds)">
+                        <div class="progress-bar bg-dark-subtle" style="width: @percentageRemaining%;"></div>
+                    </div>
                 </div>
-            </div>
-        }
-    </div>
-}
+            }
+        </div>
+    }
+</div>
 
 
 
