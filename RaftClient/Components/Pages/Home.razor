@@ -91,9 +91,9 @@
 
 
                 <div class="bg-body-secondary my-3 p-1 rounded-3">
-                    <div>@nodeData.Log</div>
+                    <div>@(nodeData.Log?.Count ?? 0)</div>
                     <strong>LOG</strong>
-                    @foreach (var (log, index) in nodeData.Log?.Select((l, i) => (l, i)) ?? Enumerable.Empty<(LogEntry l, int i)>())
+                    @foreach (var (log, index) in nodeData.Log?.Select((l, i) => (l, i)))
                     {
                         <div class=@(index <= nodeData.CommittedEntryIndex ? "text-success" : "")>
                             @log.Term - @log.Command.Key: @log.Command.Value

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Timers;
 
@@ -156,10 +156,10 @@ namespace RaftLibrary
             }
             Console.WriteLine("Log length is " + Log.Count);
 
-            //if (OtherNodes.ContainsKey(data.SentFrom) && OtherNodes.Count > 0)
-            //{
-            //    await OtherNodes[data.SentFrom].RespondAppendEntries(new ResponseEntriesData());
-            //}
+            // if (OtherNodes.Length > 0)
+            // {
+            //    await OtherNodes[data.LeaderId-1].RespondAppendEntries(new ResponseEntriesData() {SentFromNodeId=Id, Success=true, Term=CurrentTerm});
+            // }
         }
 
         public async Task RespondAppendEntries(ResponseEntriesData data)
@@ -219,8 +219,11 @@ namespace RaftLibrary
                 bool success = false;
                 if (Status == NodeStatus.Leader)
                 {
-                    StateMachine.Apply(data.Key, data.Value);
-                    success = true;
+                    LogEntry logEntry = new() {Command=data, Index=Log.Count + 1, Term=CurrentTerm};
+                    Log.Add(logEntry);
+                    var newEntries = new List<LogEntry>() {logEntry};
+                    await RequestAppendEntries(new RequestAppendEntriesData() {Entries=newEntries, LeaderCommitIndex=CommitIndex, LeaderId=Id, Term=CurrentTerm});
+                   
                 }
                 else
                 {
