@@ -6,6 +6,15 @@ namespace RaftTests.Log;
 
 public class LogTests
 {
+     // Testing #3
+    [Fact]
+    public async Task WhenNodeIsNewLogIsEmpty()
+    {
+        Node node = new Node(1);
+
+        node.Log.Count.Should().Be(0);
+    }
+
     //testing something, not sure but i need to make sure this is working for #8 to work
     // [Fact]
     // public async Task HeartbeatTimerWorks()
@@ -72,15 +81,7 @@ public class LogTests
     //     leader.Log.Count.Should().Be(1);
     // }
 
-    // Testing #3
-    [Fact]
-    public async Task WhenNodeIsNewLogIsEmpty()
-    {
-        Node node = new Node(1);
-
-        node.Log.Count.Should().Be(0);
-    }
-
+   
     // Testing #4 
     // [Fact]
     // public async Task WhenLeaderWinsElectionAllFollowersNextIndexEqualsTheLeadersLastIndexPlusOne()

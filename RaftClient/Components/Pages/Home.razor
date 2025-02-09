@@ -104,14 +104,27 @@
 
 
                 <div class="bg-body-secondary my-3 p-1 rounded-3">
-                    <div>@(nodeData.Log?.Count ?? 0)</div>
                     <strong>LOG</strong>
-                    @foreach (var (log, index) in nodeData.Log?.Select((l, i) => (l, i)))
-                    {
-                        <div class=@(index <= nodeData.CommittedEntryIndex ? "text-success" : "")>
-                            @log.Term - @log.Command.Key: @log.Command.Value
-                        </div>
-                    }
+                    <div>CommittedEntryIndex: @nodeData.CommittedEntryIndex</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Term</th>
+                                <th>Key</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var (log, index) in nodeData.Log?.Select((l, i) => (l, i)))
+                            {
+                                <tr class="@(index <= nodeData.CommittedEntryIndex ? "table-success" : "")">
+                                    <td>@log.Term</td>
+                                    <td>@log.Command.Key</td>
+                                    <td>@log.Command.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
 
                 <div class="bg-body-secondary my-3 p-1 rounded-3">
@@ -123,6 +136,9 @@
                         {
                             <div>@entry.Key: @entry.Value</div>
                         }
+                    }
+                    else {
+                        <div>STATE machine is currently null</div>
                     }
                 </div>
 

@@ -38,8 +38,6 @@ app.MapGet("/health", () => "healthy");
 
 app.MapGet("/nodeData", () =>
 {
-  System.Console.WriteLine(node.StateMachine.Store);
-
   return new NodeData()
   {
     Id = node.Id,
