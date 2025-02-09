@@ -11,5 +11,6 @@ namespace RaftLibrary
         Task RespondVote(RespondVoteData data);
         Task Start();
         Task Timeout();
+        Task SendCommand(ClientCommandData data);
     }
 }

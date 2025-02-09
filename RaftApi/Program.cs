@@ -38,6 +38,8 @@ app.MapGet("/health", () => "healthy");
 
 app.MapGet("/nodeData", () =>
 {
+  System.Console.WriteLine(node.StateMachine.Store);
+  
   return new NodeData()
   {
     Id = node.Id,
@@ -47,7 +49,7 @@ app.MapGet("/nodeData", () =>
     CurrentTermLeader = node.LeaderId,
     CommittedEntryIndex = node.CommitIndex,
     Log = node.Log,
-    StateMachineState = node.StateMachine.GetState(),
+    StateMachineState = node.StateMachine.Store,
     NodeIntervalScalar = Node.NodeIntervalScalar
   };
 });
@@ -78,6 +80,7 @@ app.MapPost("/response/vote", async (RespondVoteData response) =>
 
 app.MapPost("/request/command", async (ClientCommandData data) =>
 {
+  Console.WriteLine($"Recieved command from client: {data.Key}, {data.Value}");
   await node.SendCommand(data);
 });
 

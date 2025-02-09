@@ -10,11 +10,53 @@
 @*         <div>@url</div> *@
 @*     } *@
 @* </div> *@
+<div class="row">
+
+    @* <div class="col">
+    <div>
+      <label for="speed">
+        Election timeout between @(FormatMilliSeconds(150 * RaftNode.NodeIntervalScalar)) and @(FormatMilliSeconds(300 *
+        RaftNode.NodeIntervalScalar)) seconds
+        <br>
+        <input type="range" id="speed" name="speed" min="1" max="150" @bind:event="oninput"
+          @bind=RaftNode.NodeIntervalScalar @onchange=UpdateTimer />
+      </label>
+    </div>
+
+    <div>
+      <label for="NetworkRequestDelay">
+        Network Delay @FormatMilliSeconds(RaftSimulationNode.NetworkRequestDelay) seconds
+        <br>
+        <input type="range" id="NetworkRequestDelay" name="NetworkRequestDelay" min="10" max="10000"
+          @bind:event="oninput" @bind=RaftSimulationNode.NetworkRequestDelay />
+      </label>
+    </div>
+  </div> *@
+</div>
 
 
-
-
-<button @onclick="sendEntry">Send entry</button>
+<div class="col">
+    <div class="border p-3 rounded-3">
+        <label>
+            Key <input class="form-control" @bind=userInputKey />
+        </label>
+        <label>
+            Value <input class="form-control" @bind=userInputValue />
+        </label>
+        <hr>
+        @foreach (var nodeData in allNodeData)
+        {
+            @if (nodeData is not null)
+            {
+                <button class="btn btn-outline-primary mx-1" @onclick="() => SendCommand(nodeData.Id)">Send to Node @nodeData.Id</button>
+            }
+        }
+        <br>
+        <div>
+            @commandStatus
+        </div>
+    </div>
+</div>
 
 <div class="row">
     @foreach (var nodeData in allNodeData)
@@ -39,12 +81,6 @@
                 var maxIntervalMilliseconds = 300 * nodeData.NodeIntervalScalar;
                 var percentageRemaining = (int)(100 * (decimal)timeoutRemaining / (decimal)maxIntervalMilliseconds);
 
-                @* <div>timeoutRemaining @timeoutRemaining</div>
-            <div>timeoutRemaining / maxinterval @(100 * (decimal)timeoutRemaining / (decimal)maxIntervalMilliseconds)</div>
-            <div>maxIntervalMilliseconds @maxIntervalMilliseconds</div>
-            <div>percentage remaining @percentageRemaining</div>
-            <div>Node Interval scalar: @nodeData.NodeIntervalScalar</div> *@
-
                 <div style="width: 100%; max-width: 300px;">
                     <div class="progress" role="progressbar" aria-label="Basic example"
                         aria-valuenow=@(Math.Abs(timeoutRemaining)) aria-valuemin="0"
@@ -52,18 +88,42 @@
                         <div class="progress-bar bg-dark-subtle" style="width: @percentageRemaining%;"></div>
                     </div>
                 </div>
+
+
+                <div class="bg-body-secondary my-3 p-1 rounded-3">
+                    <div>@nodeData.Log</div>
+                    <strong>LOG</strong>
+                    @foreach (var (log, index) in nodeData.Log?.Select((l, i) => (l, i)) ?? Enumerable.Empty<(LogEntry l, int i)>())
+                    {
+                        <div class=@(index <= nodeData.CommittedEntryIndex ? "text-success" : "")>
+                            @log.Term - @log.Command.Key: @log.Command.Value
+                        </div>
+                    }
+                </div>
+
+                 <div class="bg-body-secondary my-3 p-1 rounded-3">
+                    <div>@nodeData.StateMachineState</div>
+                    <strong>STATE</strong>
+                    @if(nodeData.StateMachineState is not null)
+                    {
+                        @foreach (var entry in nodeData.StateMachineState)
+                        {
+                            <div>@entry.Key: @entry.Value</div>
+                        }
+                    }
+                </div> 
+
+
             }
         </div>
     }
 </div>
 
 
-
-
-
 @code {
     string userInputKey = "";
     string userInputValue = "";
+    string commandStatus = "";
     string[] urls = Environment.GetEnvironmentVariable("NODE_URLS").Split(',');
 
     NodeData[] allNodeData = new NodeData[3];
@@ -102,22 +162,10 @@
         timer?.Dispose();
     }
 
-
-    async void sendEntry()
-    {
-        await NodeDataService.SendEntryToApi1(new RequestAppendEntriesData() { Entry = "What's up?" });
-        allNodeData[0] = await NodeDataService.GetDataFromApi1();
-
-    }
-
-
-
     public static string FormatMilliSeconds(double milliSeconds)
     {
         return $"{milliSeconds / 1000.0:F1}";
     }
-
-
 
     string StateClass(Node node)
     {
@@ -129,7 +177,6 @@
             return "text-body-secondary";
         return "";
     }
-
     string TermClass(Node node)
     {
         var maxTerm = allNodeData.Select(n => n.Term).Max();
@@ -137,6 +184,31 @@
             return "text-primary";
         return "";
     }
+
+    async Task SendCommand(int destinationId) 
+    {
+        int dest;
+        var destNode = allNodeData.FirstOrDefault(n => n.Id == destinationId);
+        commandStatus = "sending";
+        if (destNode != null) //used copilot to make null check
+        {
+            dest = destNode.Id;
+        }
+        else
+        {
+            commandStatus = "Node not found";
+            return;
+        }
+
+        var command = new ClientCommandData(
+        type: ClientCommandType.Set,
+        key: userInputKey,
+        value: userInputValue
+        );
+
+        await NodeDataService.SendCommand(command, dest);
+    }
+
 
 
 }

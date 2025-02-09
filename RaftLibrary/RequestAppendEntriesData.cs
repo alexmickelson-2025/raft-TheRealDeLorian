@@ -9,7 +9,10 @@ namespace RaftLibrary;
 public record RequestAppendEntriesData
 {
     public int Term { get; set; }
-    public string Entry { get; set; }
-    public int SentFrom { get; set; }
+    public int LeaderId { get; set; }
+    public int PrevLogIndex { get; set; }
+    public int PrevLogTerm { get; set; }
+    
+    public List<LogEntry>? Entries { get; set; }
     public int LeaderCommitIndex { get; set; }
 }

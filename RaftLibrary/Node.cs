@@ -23,10 +23,10 @@ namespace RaftLibrary
         public Stopwatch ElectionStopwatch;
         public double LastInterval;
         Random r = new();
-        List<INode> supporters {get; set;} = new();
+        List<INode> supporters { get; set; } = new();
 
         //Logging
-        public List<RequestAppendEntriesData> Log { get; set; } = new();
+        public List<LogEntry> Log { get; set; } = new();
         public int CommitIndex { get; set; }
         public int HeartbeatsReceived { get; set; }
         public int NextIndex { get; set; } = 1;
@@ -106,7 +106,7 @@ namespace RaftLibrary
         private async void OnHeartbeatTimerRunout(object? sender, ElapsedEventArgs e)
         {
             Console.WriteLine("heartbeat...");
-            RequestAppendEntriesData requestAppendEntriesData = new RequestAppendEntriesData() { SentFrom = Id, Term = CurrentTerm, LeaderCommitIndex = CommitIndex };
+            RequestAppendEntriesData requestAppendEntriesData = new RequestAppendEntriesData() { LeaderId = Id, Term = CurrentTerm, LeaderCommitIndex = CommitIndex };
             await RequestAppendEntries(requestAppendEntriesData);
         }
 
@@ -116,11 +116,12 @@ namespace RaftLibrary
             LeaderId = Id;
             foreach (INode otherNode in OtherNodes)
             {
-                await otherNode.RequestAppendEntries(new RequestAppendEntriesData { SentFrom = Id, Term = CurrentTerm });
+                await otherNode.RequestAppendEntries(new RequestAppendEntriesData { LeaderId = Id, Term = CurrentTerm });
                 // otherNode.NextIndex = Log.Count + 1;
             }
         }
 
+        //appendentries saves client commands to the log
         public async Task RequestAppendEntries(RequestAppendEntriesData data)
         {
             if (data.Term < CurrentTerm)
@@ -131,13 +132,18 @@ namespace RaftLibrary
 
             CurrentTerm = data.Term;
             ResetElectionTimer();
-            LeaderId = data.SentFrom;
+            LeaderId = data.LeaderId;
             HeartbeatsReceived++;
             Status = NodeStatus.Follower;
 
-            //CommitIndex = data.LeaderCommitIndex;
-            Console.WriteLine("Received append entries from " + data.SentFrom);
-            Log.Add(data);
+            Console.WriteLine("Received append entries from " + data.LeaderId);
+            if (data.Entries != null)
+            {
+                foreach (var entry in data.Entries)
+                {
+                    Log.Add(entry);
+                }
+            }
             Console.WriteLine("Log length is " + Log.Count);
 
             //if (OtherNodes.ContainsKey(data.SentFrom) && OtherNodes.Count > 0)
@@ -171,38 +177,51 @@ namespace RaftLibrary
                 Console.WriteLine($"Node {Id} did not vote for node {data.CandidateId} because node {Id} has already voted");
             }
             VotedFor = data.CandidateId;
-                            await OtherNodes.FirstOrDefault(node => node.Id == data.CandidateId)?.RespondVote(new RespondVoteData() { SentFromNodeId = Id, Success = true, Term = CurrentTerm });
+            await OtherNodes.FirstOrDefault(node => node.Id == data.CandidateId)?.RespondVote(new RespondVoteData() { SentFromNodeId = Id, Success = true, Term = CurrentTerm });
 
         }
 
         public Task RespondVote(RespondVoteData data)
         {
-            if(data.Success)
+            if (data.Success)
             {
-                supporters.Add(OtherNodes.Where(e => e.Id == data.SentFromNodeId-1).FirstOrDefault());
+                supporters.Add(OtherNodes.Where(e => e.Id == data.SentFromNodeId - 1).FirstOrDefault());
                 Console.WriteLine($"Node {Id} has {supporters.Count} supporters");
             }
             if (supporters.Count > (OtherNodes.Length + 1) / 2)
             {
-              WinElection();
+                WinElection();
             }
             return Task.CompletedTask;
         }
 
-        public async Task RequestFromClient(string command)
-        {
-            var requestAppendEntriesData = new RequestAppendEntriesData() { Entry = command, SentFrom = Id, Term = CurrentTerm };
-            Log.Add(requestAppendEntriesData);
 
-            foreach (INode follower in OtherNodes)
-            {
-                await follower.RequestAppendEntries(requestAppendEntriesData);
-            }
-        }
 
         public async Task SendCommand(ClientCommandData data)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Console.WriteLine($"Processing command: {data.Type}, Key: {data.Key}, Value: {data.Value}");
+                bool success = false;
+                if (Status == NodeStatus.Leader)
+                {
+                    StateMachine.Apply(data.Key, data.Value);
+                    success = true;
+                }
+                else
+                {
+                    var leaderNode = OtherNodes.FirstOrDefault(n => n.Id == LeaderId);
+                    if (leaderNode != null)
+                    {
+                        await leaderNode.SendCommand(data);
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error processing command: {ex.Message}");
+            }
         }
 
         public void Pause()
@@ -215,33 +234,5 @@ namespace RaftLibrary
             IsPaused = false;
         }
 
-        public bool Set(string key, int value)
-        {
-            if (Status != NodeStatus.Leader)
-            {
-                return false;
-            }
-            switch (key)
-            {
-                case "X":
-                    StateMachine.AddToX(value);
-                    break;
-                case "Y":
-                    StateMachine.AddToY(value);
-                    break;
-                case "Z":
-                    StateMachine.AddToZ(value);
-                    break;
-                default:
-                    return false;
-            }
-            return true;
-        }
-
-       
-
-
-
-      
     }
 }

@@ -24,7 +24,7 @@ public class CandidateTests
     {
         Node node = new(1);
         node.CurrentTerm = 2;
-        await node.RequestAppendEntries(new RequestAppendEntriesData { SentFrom = 2, Term = 1 });
+        await node.RequestAppendEntries(new RequestAppendEntriesData { LeaderId = 2, Term = 1 });
     }
 
     //Testing 6
@@ -99,7 +99,7 @@ public class CandidateTests
         await node.Timeout();
         node.Status.Should().Be(NodeStatus.Candidate);
 
-        await node.RequestAppendEntries(new RequestAppendEntriesData { SentFrom = 2, Term = 5 });
+        await node.RequestAppendEntries(new RequestAppendEntriesData { LeaderId = 2, Term = 5 });
         node.Status.Should().Be(NodeStatus.Follower);
     }
 

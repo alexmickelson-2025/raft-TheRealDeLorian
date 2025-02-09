@@ -19,13 +19,12 @@ namespace RaftClient
             return await _httpClient.GetFromJsonAsync<NodeData>(urls[0] + "/nodeData");
         }
 
-        public async Task<RequestAppendEntriesData> SendEntryToApi1(RequestAppendEntriesData data)
+        public async Task SendCommand(ClientCommandData data, int dest)
         {
-            // var response = await _httpClient.PostAsJsonAsync(urls[0] + "/request/appendEntries", data).Result.Content.ReadFromJsonAsync<RequestAppendEntriesData>();
-            var response = await _httpClient.PostAsJsonAsync(urls[0] + "/request/appendEntries", data);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine("response content " + responseContent);
-            return await response.Content.ReadFromJsonAsync<RequestAppendEntriesData>();
+            var response = await _httpClient.PostAsJsonAsync(urls[dest - 1] + "/request/command", data);
+            // var responseContent = await response.Content.ReadAsStringAsync();
+            // Console.WriteLine("response content " + responseContent);
+            // return await response.Content.ReadFromJsonAsync<ClientCommandData>();
         }
 
         public async Task<NodeData> GetDataFromApi2()

@@ -77,7 +77,7 @@ public class FollowerTests
     public async Task WhenEmptyAppendIsReceivedNoElectionIsStarted()
     {
         Node node = new Node(1);
-        await node.RequestAppendEntries(new RequestAppendEntriesData() { SentFrom = 2 });
+        await node.RequestAppendEntries(new RequestAppendEntriesData() { LeaderId = 2 });
         NodeStatus state = node.Status;
         state.Should().Be(NodeStatus.Follower);
     }
@@ -192,7 +192,7 @@ public class FollowerTests
     public async Task FollowerWhoReceivesAppendRequestSendsResponse()
     {
         Node node = new Node(1);
-        await node.RequestAppendEntries(new RequestAppendEntriesData() { Term = 1, SentFrom = 2 });
+        await node.RequestAppendEntries(new RequestAppendEntriesData() { Term = 1, LeaderId = 2 });
 
     }
 
