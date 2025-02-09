@@ -23,7 +23,7 @@ namespace RaftLibrary
         public Stopwatch ElectionStopwatch;
         public double LastInterval;
         Random r = new();
-        List<INode> supporters {get; set;}
+        List<INode> supporters {get; set;} = new();
 
         //Logging
         public List<RequestAppendEntriesData> Log { get; set; } = new();
@@ -38,6 +38,7 @@ namespace RaftLibrary
         public Node(int nodeId)
         {
             Id = nodeId;
+            Status = NodeStatus.Follower;
             // Start(); //Make this like timer.Start() where you have to start up the node first every time you make it. or come up with some other way to make the timer not start int the ctor
         }
 
@@ -55,7 +56,7 @@ namespace RaftLibrary
 
         private async void OnTimerRunout(Object source, ElapsedEventArgs e)
         {
-            // Console.WriteLine("The election timer has run out");
+            Console.WriteLine("The election timer has run out");
             await Timeout();
             ResetElectionTimer();
         }
@@ -122,19 +123,17 @@ namespace RaftLibrary
 
         public async Task RequestAppendEntries(RequestAppendEntriesData data)
         {
-           
-
-            if (data.Term > CurrentTerm)
+            if (data.Term < CurrentTerm)
             {
-               CurrentTerm = data.Term;
-               Status = NodeStatus.Follower;
+                //respond with a "no"
             }
 
-            //if (data.Entry == null || data.Entry == "")
-            //{
-            //    LeaderId = data.SentFrom;
-            //    HeartbeatsReceived++;
-            //}
+
+            CurrentTerm = data.Term;
+            ResetElectionTimer();
+            LeaderId = data.SentFrom;
+            HeartbeatsReceived++;
+            Status = NodeStatus.Follower;
 
             //CommitIndex = data.LeaderCommitIndex;
             Console.WriteLine("Received append entries from " + data.SentFrom);

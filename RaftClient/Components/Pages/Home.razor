@@ -34,10 +34,9 @@
             <div>
                 Leader is Node @nodeData.CurrentTermLeader
             </div>
-            <div>Time remaining: @nodeData.ElectionTimeout</div>
 
             var timeoutRemaining = nodeData.ElectionTimeout;
-            var maxIntervalMilliseconds = 301 * nodeData.NodeIntervalScalar;
+            var maxIntervalMilliseconds = 300 * nodeData.NodeIntervalScalar;
             var percentageRemaining = (int)(100 * (decimal)timeoutRemaining / (decimal)maxIntervalMilliseconds);
 
             @* <div>timeoutRemaining @timeoutRemaining</div>
