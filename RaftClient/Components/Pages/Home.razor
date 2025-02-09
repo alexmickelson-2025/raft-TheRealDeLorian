@@ -48,7 +48,8 @@
         {
             @if (nodeData is not null)
             {
-                <button class="btn btn-outline-primary mx-1" @onclick="() => SendCommand(nodeData.Id)">Send to Node @nodeData.Id</button>
+                <button class="btn btn-outline-primary mx-1" @onclick="() => SendCommand(nodeData.Id)">Send to Node
+                    @nodeData.Id</button>
             }
         }
         <br>
@@ -66,7 +67,19 @@
             @if (nodeData is not null)
             {
 
-                <h2>Node @nodeData.Id</h2>
+                <div class="d-flex justify-content-between">
+                    <h3>
+                        Node @nodeData.Id
+                    </h3>
+                    @* @if (nodeData.SimulationRunning)
+                    {
+                         <button class="btn btn-outline-danger" @onclick="() => StopNode(nodeData.Id)">Stop Node @nodeData.Id</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-primary" @onclick="() => ResumeNode(nodeData.Id)">Start Node</button>
+                    } *@
+                </div>
                 <div>
                     Role: @nodeData.Status
                 </div>
@@ -101,17 +114,17 @@
                     }
                 </div>
 
-                 <div class="bg-body-secondary my-3 p-1 rounded-3">
+                <div class="bg-body-secondary my-3 p-1 rounded-3">
                     <div>@nodeData.StateMachineState</div>
                     <strong>STATE</strong>
-                    @if(nodeData.StateMachineState is not null)
+                    @if (nodeData.StateMachineState is not null)
                     {
                         @foreach (var entry in nodeData.StateMachineState)
                         {
                             <div>@entry.Key: @entry.Value</div>
                         }
                     }
-                </div> 
+                </div>
 
 
             }
@@ -185,7 +198,7 @@
         return "";
     }
 
-    async Task SendCommand(int destinationId) 
+    async Task SendCommand(int destinationId)
     {
         int dest;
         var destNode = allNodeData.FirstOrDefault(n => n.Id == destinationId);
@@ -208,6 +221,7 @@
 
         await NodeDataService.SendCommand(command, dest);
     }
+
 
 
 
