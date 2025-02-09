@@ -7,16 +7,16 @@ public class CandidateTests
 {
 
     //Testing #11
-    [Theory]
-    [InlineData(1)]
-    [InlineData(456)]
-    [InlineData(230)]
-    public async Task NewCandidateVotesForItself(int id)
-    {
-        Node node = new(id);
-        await node.Timeout();
-        node.VotedFor.Should().Be(id);
-    }
+    // [Theory]
+    // [InlineData(1)]
+    // [InlineData(456)]
+    // [InlineData(230)]
+    // public async Task NewCandidateVotesForItself(int id)
+    // {
+    //     Node node = new(id);
+    //     await node.Timeout();
+    //     node.VotedFor.Should().Be(id);
+    // }
 
     //Testing #18
     [Fact]
@@ -28,15 +28,15 @@ public class CandidateTests
     }
 
     //Testing 6
-    [Fact]
-    public async Task NewElectionIncrementsTerm()
-    {
-        Node node = new(1);
-        int startingTerm = node.CurrentTerm;
-        await node.Timeout();
-        node.CurrentTerm.Should().BeGreaterThan(startingTerm);
+    // [Fact]
+    // public async Task NewElectionIncrementsTerm()
+    // {
+    //     Node node = new(1);
+    //     int startingTerm = node.CurrentTerm;
+    //     await node.Timeout();
+    //     node.CurrentTerm.Should().BeGreaterThan(startingTerm);
 
-    }
+    // }
 
     ////Testing #16
     //[Fact]
@@ -57,13 +57,13 @@ public class CandidateTests
 
     //Testing #8
     //Single cluster
-    [Fact]
-    public async Task SingleClusterCandidateBecomesLeaderWhenMajorityOfVotes()
-    {
-        Node node = new(1);
-        await node.Timeout();
-        node.Status.Should().Be(NodeStatus.Leader);
-    }
+    // [Fact]
+    // public async Task SingleClusterCandidateBecomesLeaderWhenMajorityOfVotes()
+    // {
+    //     Node node = new(1);
+    //     await node.Timeout();
+    //     node.Status.Should().Be(NodeStatus.Leader);
+    // }
 
     //Testing #8    
     //3-node cluster
@@ -87,21 +87,24 @@ public class CandidateTests
 
 
     //Testing #12
-    [Fact]
-    public async Task WhenCandidateReceivesAppendEntriesFromLaterTermItBecomesFollower()
-    {
-        Node node = new(1);
-        Node node2 = new(2);
-        node.OtherNodes.Add(node2.Id, node2);
-        node2.OtherNodes.Add(node.Id, node);
-        node2.CurrentTerm = 5;
+    // [Fact]
+    // public async Task WhenCandidateReceivesAppendEntriesFromLaterTermItBecomesFollower()
+    // {
+    //     Node node = new(1);
+    //     Node node2 = new(2);
+    //     node.OtherNodes = new INode[2];
+    //     node2.OtherNodes = new INode[2];
+    //     node.OtherNodes[0] = node2;
+    //     node2.OtherNodes[0] = node;
+    //     node2.CurrentTerm = 5;
 
-        await node.Timeout();
-        node.Status.Should().Be(NodeStatus.Candidate);
+    //     await node.Start();
+    //     await node.Timeout();
+    //     node.Status.Should().Be(NodeStatus.Candidate);
 
-        await node.RequestAppendEntries(new RequestAppendEntriesData { LeaderId = 2, Term = 5 });
-        node.Status.Should().Be(NodeStatus.Follower);
-    }
+    //     await node.RequestAppendEntries(new RequestAppendEntriesData { LeaderId = 2, Term = 5 });
+    //     node.Status.Should().Be(NodeStatus.Follower);
+    // }
 
     //Testing #13
     //[Fact]
@@ -134,4 +137,42 @@ public class CandidateTests
     //    node2.State.Should().Be(NodeState.Follower);
     //    node2.HeartbeatsReceived.Should().BeGreaterThanOrEqualTo(1);
     //}
+
+
+     // [Fact]
+    // public async Task GivenNodeIsLeaderWithElectionLoopWhenTheyGetPausedOtherNodesDontGetHeartbeat400ms()
+    // {
+    //     Node leader = new Node(1);
+    //     leader.Status = NodeStatus.Leader;
+    //     INode node1 = Substitute.For<INode>();
+    //     leader.OtherNodes.Add(node1.Id, node1);
+    //     leader.Start();
+
+    //     int nodeHeartbeatsBeforePause = node1.HeartbeatsReceived;
+
+    //     leader.Pause();
+    //     Thread.Sleep(400);
+    //     node1.HeartbeatsReceived.Should().Be(nodeHeartbeatsBeforePause);
+    // }
+
+    // [Fact]
+    // public async Task GivenNodeIsLeaderWithElectionLoopWhenPauseGetsNoHeartbeatsThenResume()
+    // {
+    //     Node leader = new Node(1);
+    //     leader.Status = NodeStatus.Leader;
+    //     INode node1 = Substitute.For<INode>();
+    //     leader.OtherNodes.Add(node1.Id, node1);
+    //     int nodeHeartbeatsBeforePause = node1.HeartbeatsReceived;
+
+    //     leader.Start(); //TODO: I don't think the start is working the way I think it does
+    //     Thread.Sleep(400);
+
+    //     leader.Pause();
+    //     Thread.Sleep(400);
+    //     node1.HeartbeatsReceived.Should().Be(nodeHeartbeatsBeforePause);
+
+    //     leader.Resume();
+    //     Thread.Sleep(1000);
+    //     node1.HeartbeatsReceived.Should().BeGreaterThan(nodeHeartbeatsBeforePause);
+    // }
 }

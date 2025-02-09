@@ -12,7 +12,7 @@ namespace RaftLibrary
         public NodeStatus Status { get; set; }
         public StateMachine StateMachine { get; set; } = new();
         public INode[] OtherNodes { get; set; }
-        public static int NodeIntervalScalar { get; set; }
+        public static int NodeIntervalScalar { get; set; } = 50;
 
 
         //Election
