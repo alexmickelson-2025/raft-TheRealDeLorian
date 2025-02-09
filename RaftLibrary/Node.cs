@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Timers;
 
@@ -105,17 +105,28 @@ namespace RaftLibrary
 
         private async void OnHeartbeatTimerRunout(object? sender, ElapsedEventArgs e)
         {
-            Console.WriteLine("heartbeat...");
-            RequestAppendEntriesData requestAppendEntriesData = new RequestAppendEntriesData() { LeaderId = Id, Term = CurrentTerm, LeaderCommitIndex = CommitIndex };
-            await RequestAppendEntries(requestAppendEntriesData);
+            if(Status == NodeStatus.Leader)
+            {
+               await SendHeartbeats();
+            }
+            else
+            {
+                HeartbeatTimer.Stop();
+            }
         }
 
         public async Task WinElection()
         {
             Status = NodeStatus.Leader;
             LeaderId = Id;
+            await StartHeartbeatTimer();
+        }
+
+        public async Task SendHeartbeats()
+        {
             foreach (INode otherNode in OtherNodes)
             {
+                System.Console.WriteLine("Sending heartbeat");
                 await otherNode.RequestAppendEntries(new RequestAppendEntriesData { LeaderId = Id, Term = CurrentTerm });
                 // otherNode.NextIndex = Log.Count + 1;
             }
@@ -126,9 +137,8 @@ namespace RaftLibrary
         {
             if (data.Term < CurrentTerm)
             {
-                //respond with a "no"
+                return; //respond with a "no"
             }
-
 
             CurrentTerm = data.Term;
             ResetElectionTimer();
@@ -136,7 +146,7 @@ namespace RaftLibrary
             HeartbeatsReceived++;
             Status = NodeStatus.Follower;
 
-            Console.WriteLine("Received append entries from " + data.LeaderId);
+            Console.WriteLine("Received append entries from " + data.LeaderId + ". Heartbeats received: " + HeartbeatsReceived);
             if (data.Entries != null)
             {
                 foreach (var entry in data.Entries)
@@ -154,7 +164,11 @@ namespace RaftLibrary
 
         public async Task RespondAppendEntries(ResponseEntriesData data)
         {
-
+            if(data.Success )
+            {
+                // if(loggedppl > total/2)  
+                //apply the command
+            }
         }
 
         public async Task RequestVote(RequestVoteData data)
